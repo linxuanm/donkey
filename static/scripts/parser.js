@@ -63,8 +63,9 @@ const lang = P.createLanguage({
                 if (idxs.length === 0) {
                     return exp;
                 }
-
-                return [exp, ...idxs].reduce((a, b) => new BinExp(b.kind, a, b.exp));
+                return [exp, ...idxs].reduce(
+                    (a, b) => new BinExp(b.kind, a, b.exp)
+                );
             }
         );
     },
