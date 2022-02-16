@@ -57,6 +57,14 @@ class CallExp {
     }
 }
 
+class AsnStmt {
+
+    constructor(name, exp) {
+        this.name = name;
+        this.exp = exp;
+    }
+}
+
 function parens(p, a, b) {
     return p.trim(_).wrap(P.string(a), P.string(b));
 }
@@ -157,5 +165,13 @@ const lang = P.createLanguage({
             parens(r.Exp, "(", ")"),
             parens(r.ListExp, '[', ']').map(e => new LitExp('list', e))
         );
-    }
+    },
+    AsnStmt: r => {
+        return P.seqMap(
+            iden.skip(P.string('=').trim(_)),
+            r.Exp,
+            (a, b) => new AsnStmt(a, b)
+        );
+    },
+    ExpStmt: r => r.Exp
 });
