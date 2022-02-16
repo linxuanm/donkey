@@ -2,6 +2,7 @@ const P = Parsimmon;
 
 const _ = P.optWhitespace;
 const iden = P.regexp(/[A-Z]+/);
+const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
 
 function parens(p, a, b) {
@@ -32,6 +33,15 @@ class BinExp {
     }
 }
 
+class InvokeExp {
+
+    constructor(obj, method, params) {
+        this.obj = obj;
+        this.method = method;
+        this.params = params;
+    }
+}
+
 const lang = P.createLanguage({
     Stmt: r => {
         return P.alt(asnStmt);
@@ -48,23 +58,36 @@ const lang = P.createLanguage({
             r.IdxExp
         );
     },
+    ExpSuffix: r => {
+        const idxParser = parens(r.Exp, "[", "]").map(e => {
+            return {makeExp: a => new BinExp('index', a, e)}
+        });
+        const callParser = parens(r.ListExp, "(", ")").map(e => {
+            return {makeExp: a => new BinExp('call', a, e)}
+        });
+        const invokeParser = P.seqObj(
+            P.string("."),
+            ['method', funcName],
+            _,
+            ['params', parens(r.ListExp, "(", ")")]
+        ).map(e => {
+            return {makeExp: a => new InvokeExp(a, e.method, e.params)};
+        });
+
+        return P.sepBy(P.alt(
+            idxParser, callParser, invokeParser
+        ), _);
+    },
     IdxExp: r => {
         return P.seqMap(
             r.SimpExp,
-            _.then(P.sepBy(P.alt(
-                parens(r.Exp, "[", "]").map(e => {
-                    return {kind: 'index', exp: e}
-                }),
-                parens(r.ListExp, "(", ")").map(e => {
-                    return {kind: 'call', exp: e}
-                })
-            ), _)),
+            _.then(r.ExpSuffix),
             (exp, idxs) => {
                 if (idxs.length === 0) {
                     return exp;
                 }
                 return [exp, ...idxs].reduce(
-                    (a, b) => new BinExp(b.kind, a, b.exp)
+                    (a, b) => b.makeExp(a)
                 );
             }
         );
