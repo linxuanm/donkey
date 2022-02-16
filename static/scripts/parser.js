@@ -58,7 +58,7 @@ class CallExp {
 }
 
 function parens(p, a, b) {
-    return P.trim(_).wrap(P.string(a), P.string(b));
+    return p.trim(_).wrap(P.string(a), P.string(b));
 }
 
 function makeUniExp(op, parser) {
@@ -81,6 +81,14 @@ function chainOp(ops, parser) {
     });
 }
 
+function opParser(precOps, parser) {
+    for (var i of precOps) {
+        parser = chainOp(i, parser);
+    }
+
+    return parser;
+}
+
 const lang = P.createLanguage({
     Stmt: r => {
         return P.alt(asnStmt);
@@ -93,7 +101,7 @@ const lang = P.createLanguage({
         );
     },
     Exp: r => {
-        return r.UniExp;//opParser(ops, r.UniExp);
+        return opParser(ops, r.UniExp);
     },
     ExpSuffix: r => {
         const idxParser = parens(r.Exp, "[", "]").map(e => {
@@ -139,11 +147,11 @@ const lang = P.createLanguage({
     },
     SimpExp: r => {
         return P.alt(
-            P.seqObj(
-                ['name', funcName],
-                _,
-                ['params', parens(r.ListExp, "(", ")")]
-            ).map(e => new CallExp(e.name, e.params)),
+            P.seqMap(
+                funcName.skip(_),
+                parens(r.ListExp, "(", ")"),
+                (name, params) => new CallExp(name, params)
+            ),
             iden,
             int.map(n => new LitExp('integer', n)),
             parens(r.Exp, "(", ")"),
