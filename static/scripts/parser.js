@@ -33,12 +33,18 @@ class BinExp {
     }
 }
 
-class InvokeExp {
+class CallExp {
 
-    constructor(obj, method, params) {
-        this.obj = obj;
-        this.method = method;
+    /*
+        'isMethod' is just a hacky way to hide the object
+        on which the method is invoked in the stack trace
+        cuz APPARENTLY IB STUDENTS CAN'T UNDERSTAND "the
+        first parameter is the instance object"
+    */
+    constructor(name, params, isMethod) {
+        this.name = name;
         this.params = params;
+        this.isMethod = isMethod;
     }
 }
 
@@ -62,20 +68,17 @@ const lang = P.createLanguage({
         const idxParser = parens(r.Exp, "[", "]").map(e => {
             return {makeExp: a => new BinExp('index', a, e)}
         });
-        const callParser = parens(r.ListExp, "(", ")").map(e => {
-            return {makeExp: a => new BinExp('call', a, e)}
-        });
         const invokeParser = P.seqObj(
             P.string("."),
             ['method', funcName],
             _,
             ['params', parens(r.ListExp, "(", ")")]
         ).map(e => {
-            return {makeExp: a => new InvokeExp(a, e.method, e.params)};
+            return {makeExp: a => new CallExp(e.method, [a, ...e.params], true)};
         });
 
         return P.sepBy(P.alt(
-            idxParser, callParser, invokeParser
+            idxParser, invokeParser
         ), _);
     },
     IdxExp: r => {
@@ -97,6 +100,11 @@ const lang = P.createLanguage({
     },
     SimpExp: r => {
         return P.alt(
+            P.seqObj(
+                ['name', funcName],
+                _,
+                ['params', parens(r.ListExp, "(", ")")]
+            ).map(e => new CallExp(e.name, e.params)),
             iden,
             int.map(n => new LitExp('integer', n)),
             parens(r.Exp, "(", ")")
