@@ -5,9 +5,10 @@ const iden = P.regexp(/[A-Z]+/);
 const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
 
-function parens(p, a, b) {
-    return P.string(a).skip(_).then(p).skip(_).skip(P.string(b));
-}
+const ops = [
+    ['*', 'div', 'mod'],
+    ['+', '-']
+];
 
 class LitExp {
 
@@ -33,6 +34,14 @@ class BinExp {
     }
 }
 
+class UniExp {
+
+    constructor(op, val) {
+        this.op = op;
+        this.val = val;
+    }
+}
+
 class CallExp {
 
     /*
@@ -48,6 +57,14 @@ class CallExp {
     }
 }
 
+function parens(p, a, b) {
+    return P.string(a).skip(_).then(p).skip(_).skip(P.string(b));
+}
+
+function makeUniExp(op, parser) {
+    return P.string(op).skip(_).then(parser).map(e => new UniExp(op, e));
+}
+
 const lang = P.createLanguage({
     Stmt: r => {
         return P.alt(asnStmt);
@@ -60,9 +77,7 @@ const lang = P.createLanguage({
         );
     },
     Exp: r => {
-        return P.alt(
-            r.IdxExp
-        );
+        return r.UniExp;//opParser(ops, r.UniExp);
     },
     ExpSuffix: r => {
         const idxParser = parens(r.Exp, "[", "]").map(e => {
@@ -81,7 +96,15 @@ const lang = P.createLanguage({
             idxParser, invokeParser
         ), _);
     },
-    IdxExp: r => {
+    UniExp: r => {
+        return P.alt(
+            makeUniExp('not',  r.UniExp),
+            makeUniExp('-', r.UniExp),
+            makeUniExp('!', r.UniExp),
+            r.CompExp
+        );
+    },
+    CompExp: r => {
         return P.seqMap(
             r.SimpExp,
             _.then(r.ExpSuffix),
@@ -107,7 +130,8 @@ const lang = P.createLanguage({
             ).map(e => new CallExp(e.name, e.params)),
             iden,
             int.map(n => new LitExp('integer', n)),
-            parens(r.Exp, "(", ")")
+            parens(r.Exp, "(", ")"),
+            parens(r.ListExp, '[', ']').map(e => new LitExp('list', e))
         );
     }
 });
