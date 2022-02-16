@@ -58,11 +58,27 @@ class CallExp {
 }
 
 function parens(p, a, b) {
-    return P.string(a).skip(_).then(p).skip(_).skip(P.string(b));
+    return P.trim(_).wrap(P.string(a), P.string(b));
 }
 
 function makeUniExp(op, parser) {
     return P.string(op).skip(_).then(parser).map(e => new UniExp(op, e));
+}
+
+function oneOfStr(arr) {
+    return P.alt(...arr.map(e => P.string(e))).desc(arr);
+}
+
+function chainOp(ops, parser) {
+    const further = P.seqObj(
+        ['op', oneOfStr(ops)],
+        _,
+        ['exp', parser]
+    );
+
+    return P.seqMap(parser, _.then(further).many(), (x, l) => {
+        return [x, ...l].reduce((a, b) => new BinExp(b.op, a, b.exp));
+    });
 }
 
 const lang = P.createLanguage({
