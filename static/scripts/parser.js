@@ -7,7 +7,10 @@ const int = P.regexp(/-?[0-9]+/).map(parseInt);
 
 const ops = [
     ['*', 'div', 'mod'],
-    ['+', '-']
+    ['+', '-'],
+    ['==', '!=', '>=', '<=', '>', '<'],
+    ['and'],
+    ['or']
 ];
 
 class Node {
