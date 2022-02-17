@@ -10,39 +10,58 @@ const ops = [
     ['+', '-']
 ];
 
-class LitExp {
+class Node {
 
-    constructor(valType, val) {
+    constructor(line) {
+        this.line = line;
+    }
+}
+
+class Exp extends Node {
+    // TODO: the stack top codegen thingy
+}
+
+class Stmt extends Node {
+    // TODO: the code emit thingy
+}
+
+class LitExp extends Exp {
+
+    constructor(line, valType, val) {
+        super(line);
         this.valType = valType;
         this.val = val;
     }
 }
 
-class IdenExp {
+class IdenExp extends Exp {
 
-    constructor(name) {
+    constructor(line, name) {
+        super(line);
         this.name = name;
     }
 }
 
-class BinExp {
+class BinExp extends Exp {
 
-    constructor(op, a, b) {
+    constructor(line, op, a, b) {
+        super(line);
         this.op = op;
         this.a = a;
         this.b = b;
     }
 }
 
-class UniExp {
+class UniExp extends Exp {
 
-    constructor(op, val) {
+    constructor(line, op, val) {
+        super(line);
         this.op = op;
         this.val = val;
     }
 }
 
-class CallExp {
+class CallExp extends Exp {
 
     /*
         'isMethod' is just a hacky way to hide the object
@@ -50,7 +69,8 @@ class CallExp {
         cuz APPARENTLY IB STUDENTS CAN'T UNDERSTAND "the
         first parameter is the instance object"
     */
-    constructor(name, params, isMethod) {
+    constructor(line, name, params, isMethod) {
+        super(line);
         this.name = name;
         this.params = params;
         this.isMethod = isMethod;
@@ -70,7 +90,11 @@ function parens(p, a, b) {
 }
 
 function makeUniExp(op, parser) {
-    return P.string(op).skip(_).then(parser).map(e => new UniExp(op, e));
+    return P.seqMap(
+        P.string(op).skip(_).node(),
+        parser,
+        (node, e) => new UniExp(node.start, node.value, e)
+    );
 }
 
 function oneOfStr(arr) {
@@ -79,13 +103,15 @@ function oneOfStr(arr) {
 
 function chainOp(ops, parser) {
     const further = P.seqObj(
-        ['op', oneOfStr(ops)],
+        ['op', oneOfStr(ops).node()],
         _,
         ['exp', parser]
     );
 
-    return P.seqMap(parser, _.then(further).many(), (x, l) => {
-        return [x, ...l].reduce((a, b) => new BinExp(b.op, a, b.exp));
+    return P.seqMap(parser.mark().skip(_), further.many(), (x, l) => {
+        return [x, ...l].reduce(
+            (a, b) => new BinExp(b.op.start, b.op.value, a, b.exp)
+        );
     });
 }
 
@@ -112,16 +138,18 @@ const lang = P.createLanguage({
         return opParser(ops, r.UniExp);
     },
     ExpSuffix: r => {
-        const idxParser = parens(r.Exp, "[", "]").map(e => {
-            return {makeExp: a => new BinExp('index', a, e)}
+        const idxParser = parens(r.Exp, "[", "]").node().map(e => {
+            return {makeExp: a => new BinExp(e.start, 'index', a, e.value)}
         });
         const invokeParser = P.seqObj(
             P.string("."),
-            ['method', funcName],
+            ['method', funcName.mark()],
             _,
             ['params', parens(r.ListExp, "(", ")")]
         ).map(e => {
-            return {makeExp: a => new CallExp(e.method, [a, ...e.params], true)};
+            return {makeExp: a => new CallExp(
+                e.method.start, e.method.value, [a, ...e.params], true
+            )};
         });
 
         return P.sepBy(P.alt(
@@ -156,14 +184,16 @@ const lang = P.createLanguage({
     SimpExp: r => {
         return P.alt(
             P.seqMap(
-                funcName.skip(_),
+                funcName.mark().skip(_),
                 parens(r.ListExp, "(", ")"),
-                (name, params) => new CallExp(name, params)
+                (name, params) => new CallExp(name.start, name.value, params)
             ),
             iden,
-            int.map(n => new LitExp('integer', n)),
+            int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             parens(r.Exp, "(", ")"),
-            parens(r.ListExp, '[', ']').map(e => new LitExp('list', e))
+            parens(r.ListExp, '[', ']').mark().map(
+                e => new LitExp(e.start, 'list', e.value)
+            )
         );
     },
     AsnStmt: r => {
