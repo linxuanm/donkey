@@ -80,9 +80,10 @@ class CallExp extends Exp {
     }
 }
 
-class AsnStmt {
+class AsnStmt extends Node {
 
-    constructor(name, exp) {
+    constructor(line, name, exp) {
+        super(line);
         this.name = name;
         this.exp = exp;
     }
@@ -94,7 +95,7 @@ function parens(p, a, b) {
 
 function makeUniExp(op, parser) {
     return P.seqMap(
-        P.string(op).skip(_).node(),
+        op.skip(_).mark(),
         parser,
         (node, e) => new UniExp(node.start, node.value, e)
     );
@@ -106,12 +107,12 @@ function oneOfStr(arr) {
 
 function chainOp(ops, parser) {
     const further = P.seqObj(
-        ['op', oneOfStr(ops).node()],
+        ['op', oneOfStr(ops).mark()],
         _,
         ['exp', parser]
     );
 
-    return P.seqMap(parser.mark().skip(_), further.many(), (x, l) => {
+    return P.seqMap(parser.skip(_), further.many(), (x, l) => {
         return [x, ...l].reduce(
             (a, b) => new BinExp(b.op.start, b.op.value, a, b.exp)
         );
@@ -126,9 +127,13 @@ function opParser(precOps, parser) {
     return parser;
 }
 
+function end(s) {
+    return P.string('end').skip(P.whitespace).then(P.string(s));
+}
+
 const lang = P.createLanguage({
     Stmt: r => {
-        return P.alt(asnStmt);
+        return P.alt(r.AsnStmt);
     },
     AsnStmt: r => {
         return P.seqObj(
@@ -141,7 +146,7 @@ const lang = P.createLanguage({
         return opParser(ops, r.UniExp);
     },
     ExpSuffix: r => {
-        const idxParser = parens(r.Exp, "[", "]").node().map(e => {
+        const idxParser = parens(r.Exp, "[", "]").mark().map(e => {
             return {makeExp: a => new BinExp(e.start, 'index', a, e.value)}
         });
         const invokeParser = P.seqObj(
@@ -161,9 +166,9 @@ const lang = P.createLanguage({
     },
     UniExp: r => {
         return P.alt(
-            makeUniExp('not',  r.UniExp),
-            makeUniExp('-', r.UniExp),
-            makeUniExp('!', r.UniExp),
+            makeUniExp(P.string('not').skip(P.whitespace),  r.UniExp),
+            makeUniExp(P.string('-'), r.UniExp),
+            makeUniExp(P.string('!'), r.UniExp),
             r.CompExp
         );
     },
@@ -182,7 +187,7 @@ const lang = P.createLanguage({
         );
     },
     ListExp: r => {
-        return r.Exp.sepBy(P.seq(_, P.string(","), _));
+        return r.Exp.sepBy(P.string(",").trim(_));
     },
     SimpExp: r => {
         return P.alt(
@@ -199,12 +204,42 @@ const lang = P.createLanguage({
             )
         );
     },
+    Stmt: r => {
+        return P.alt(r.AsnStmt);
+    },
     AsnStmt: r => {
         return P.seqMap(
-            iden.skip(P.string('=').trim(_)),
+            iden,
+            P.string('=').mark().trim(_),
             r.Exp,
-            (a, b) => new AsnStmt(a, b)
+            (a, eq, b) => new AsnStmt(eq.start, a, b)
         );
     },
-    ExpStmt: r => r.Exp
+    IfPiece: r => {
+        return P.seqObj(
+            ['line', P.string('if').mark()],
+            P.whitespace,
+            ['cond', r.Exp],
+            P.whitespace,
+            P.string('then'),
+            P.whitespace,
+            ['if', r.Stmt.sepBy(P.whitespace)]
+        );
+    },
+    ElseIfPiece: r => {
+        return P.seqObj(
+            P.string('else'),
+            P.whitespace,
+            ['ifPiece', r.Stmt.IfPiece]
+        ).map(e => e.ifPiece);
+    },
+    ElsePiece: r => {
+        return P.seqObj(
+            P.string()
+        );
+    },
+    ExpStmt: r => r.Exp,
+    Global: r => {
+        return P.alt(r.Stmt).sepBy(P.newline);
+    }
 });
