@@ -107,12 +107,13 @@ function oneOfStr(arr) {
 
 function chainOp(ops, parser) {
     const further = P.seqObj(
+        _,
         ['op', oneOfStr(ops).mark()],
         _,
         ['exp', parser]
     );
 
-    return P.seqMap(parser.skip(_), further.many(), (x, l) => {
+    return P.seqMap(parser, further.many(), (x, l) => {
         return [x, ...l].reduce(
             (a, b) => new BinExp(b.op.start, b.op.value, a, b.exp)
         );
@@ -146,15 +147,15 @@ const lang = P.createLanguage({
         return opParser(ops, r.UniExp);
     },
     ExpSuffix: r => {
-        const idxParser = parens(r.Exp, "[", "]").mark().map(e => {
+        const idxParser = _.then(parens(r.Exp, "[", "]").mark().map(e => {
             return {makeExp: a => new BinExp(e.start, 'index', a, e.value)}
-        });
-        const invokeParser = P.seqObj(
+        }));
+        const invokeParser = _.then(P.seqObj(
             P.string("."),
             ['method', funcName.mark()],
             _,
             ['params', parens(r.ListExp, "(", ")")]
-        ).map(e => {
+        )).map(e => {
             return {makeExp: a => new CallExp(
                 e.method.start, e.method.value, [a, ...e.params], true
             )};
@@ -175,7 +176,7 @@ const lang = P.createLanguage({
     CompExp: r => {
         return P.seqMap(
             r.SimpExp,
-            _.then(r.ExpSuffix),
+            r.ExpSuffix,
             (exp, idxs) => {
                 if (idxs.length === 0) {
                     return exp;
@@ -240,6 +241,6 @@ const lang = P.createLanguage({
     },
     ExpStmt: r => r.Exp,
     Global: r => {
-        return P.alt(r.Stmt).sepBy(P.newline);
+        return P.alt(r.Stmt).sepBy(P.newline.trim(P.regexp(/( |\t)*/)));
     }
 });
