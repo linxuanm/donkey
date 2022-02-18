@@ -6,7 +6,6 @@ html, body {
 textarea {
     resize: none;
     max-width: 100%;
-    padding: 0;
     border: 0;
 }
 
@@ -24,6 +23,13 @@ textarea {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
+    outline: none;
+    padding: 10px;
+}
+
+.code-font {
+    color: #D4D4D4;
+    font-size: 1.5em;
 }
 
 .code-area {
