@@ -38,8 +38,12 @@ textarea {
     line-height: 25px;
 }
 
+#action-bar {
+    flex: 0 0 65px;
+}
+
 .title-bar-item {
-    margin: 0 75px 0 75px;
+    margin: 0 50px 0 50px;
 }
 
 .ide-name {

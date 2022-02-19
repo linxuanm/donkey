@@ -52,14 +52,14 @@ $(function() {
     });
 
     codeArea.keydown(function(e) {
-        if (e.keyCode !== 9 && e.keyCode !== 13 && e.keyCode !== 8) return;
+        if (e.which !== 9 && e.which !== 13 && e.which !== 8) return;
 
         const cmd = (navigator.platform.includes("Mac") ? e.metaKey : e.ctrlKey);
         const start = this.selectionStart;
         const end = this.selectionEnd;
         const value = $(this).val();
 
-        if (e.keyCode === 9) { // tab
+        if (e.which === 9) { // tab
             e.preventDefault();
 
             $(this).val(
@@ -69,7 +69,7 @@ $(function() {
             );
             this.selectionStart = this.selectionEnd = start + config.tabSize;
             $(this).trigger('input');
-        } else if (e.keyCode === 13) { // return
+        } else if (e.which === 13) { // return
             e.preventDefault();
 
             const lines = value.substring(0, start).split(/\r|\r\n|\n/);
@@ -85,9 +85,8 @@ $(function() {
             // scroll to caret
             codeArea.blur();
             codeArea.focus();
-
             $(this).trigger('input');
-        } else if (e.keyCode === 8) { // backspace
+        } else if (e.which === 8) { // backspace
             if (start !== end || start === 0) return;
             if (value[start - 1] !== ' ' && !cmd) return;
 
