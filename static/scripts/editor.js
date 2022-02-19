@@ -108,7 +108,7 @@ $(function() {
         }
     });
 
-    codeArea.on("keydown click focus", function() {
+    codeArea.on("keyup click focus", function() {
         const start = this.selectionStart;
         const lines = $(this).val().substring(0, start).split(/\r|\r\n|\n/);
         const col = lines.length === 0 ? 0 : lines[lines.length - 1].length;
