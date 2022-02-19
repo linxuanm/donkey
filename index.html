@@ -7,19 +7,26 @@
 		<link rel='stylesheet' href='static/styles/style.css'>
     </head>
     <body class="flex-container vert-flex">
-        <div id="action-bar" class="light-gray container-item"></div>
-        <div id="frame" class="flex-container container-item">
-            <div class="container-item dark-gray code-area flex-container">
-                <div id="line-container" class="dense-gray dark-border">
-                    <div class="line-no font-mono no-select">
-                        <span class="line-no-inner">1</span>
+        <div id="action-bar" class="light-gray flex-item"></div>
+        <div class="flex-container flex-item">
+            <div class="flex-container flex-item vert-flex">
+                <div class="flex-item dark-gray code-area flex-container">
+                    <div id="line-container" class="dense-gray dark-border">
+                        <div class="line-no font-mono no-select">
+                            <span class="line-no-inner">1</span>
+                        </div>
                     </div>
+                    <textarea id="code"
+                        class="dark-gray code-font flex-item font-mono"
+                        spellcheck="false"></textarea>
                 </div>
-                <textarea id="code"
-                    class="dark-gray code-font container-item font-mono"
-                    spellcheck="false"></textarea>
+                <div id="status-bar" 
+                    class="flex-item light-blue no-select flex-container">
+                    <div class="info-font flex-item">Editing</div>
+                    <div class="info-font flex-item">Editing</div>
+                </div>
             </div>
-            <div class="container-item gray"></div>
+            <div class="flex-item gray"></div>
         </div>
 
         <script type="text/javascript" src="static/vendors/jquery-3.6.0.min.js"></script>

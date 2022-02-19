@@ -11,11 +11,8 @@ textarea {
 
 #action-bar {
     width: 100%;
-    height: 50px;
-}
 
-#frame {
-    height: 100%;
+    flex: 0 0 50px;
 }
 
 #code {
@@ -37,6 +34,21 @@ textarea {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+
+#status-bar {
+    flex: 0 0 25px;
+    line-height: 25px;
+    min-width: 100%;
+    width: 0;
+}
+
+.bar-left {
+    left: 10px;
+}
+
+.bar-right {
+    right: 10px;
 }
 
 .no-select {
@@ -70,8 +82,20 @@ textarea {
     font-size: 20px;
 }
 
+.info-font {
+    color: #FFF;
+    font-family: arial;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
 .code-area {
     width: 0;
+    min-width: 100%;
+}
+
+.light-blue {
+    background-color: #0078CE;
 }
 
 .light-gray {
@@ -103,7 +127,7 @@ textarea {
     flex-direction: column;
 }
 
-.container-item {
+.flex-item {
     flex-grow: 1;
     padding: 0;
 }

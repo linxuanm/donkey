@@ -44,19 +44,31 @@ $(function() {
     });
 
     codeArea.keydown(function(e) {
+        if (e.keyCode !== 9 && e.keyCode !== 13) return;
+
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const value = $(this).val();
+
         if (e.keyCode === 9) { // tab
-            e.preventDefault();
-
-            const start = this.selectionStart;
-            const end = this.selectionStart;
-            const value = $(this).val();
-
             $(this).val(
                 value.substring(0, start) +
                 ' '.repeat(config.tabSize) +
                 value.substring(end)
             );
             this.selectionStart = this.selectionEnd = start + config.tabSize;
+        } else if (e.keyCode === 13) { // enter
+            const lines = value.substring(0, start).split(/\r|\r\n|\n/);
+            const last = lines[lines.length - 1];
+            const indent = last.match(/^ */)[0];
+            $(this).val(
+                value.substring(0, start) +
+                '\n' + indent +
+                value.substring(end)
+            );
+            this.selectionStart = this.selectionEnd = start + indent.length + 1;
+            $(this).trigger('input');
         }
     });
 });
