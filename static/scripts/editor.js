@@ -25,6 +25,14 @@ function updateLineNo(container, num) {
     }
 }
 
+function updateStatusText(text) {
+
+}
+
+function updateCaretPos(line, col) {
+    $('#caret-pos').text(`Line ${line}, Col ${col}`);
+}
+
 $(function() {
     const container = $('#line-container');
     const codeArea = $('#code');
@@ -60,6 +68,7 @@ $(function() {
                 value.substring(end)
             );
             this.selectionStart = this.selectionEnd = start + config.tabSize;
+            $(this).trigger('input');
         } else if (e.keyCode === 13) { // return
             e.preventDefault();
 
@@ -94,7 +103,16 @@ $(function() {
 
                 this.selectionStart = this.selectionEnd = start - amount;
                 e.preventDefault();
+                $(this).trigger('input');
             }
         }
+    });
+
+    codeArea.on("keydown click focus", function() {
+        const start = this.selectionStart;
+        const lines = $(this).val().substring(0, start).split(/\r|\r\n|\n/);
+        const col = lines.length === 0 ? 0 : lines[lines.length - 1].length;
+
+        updateCaretPos(lines.length, col);
     });
 });
