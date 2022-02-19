@@ -9,8 +9,13 @@
     <body>
         <div id="action-bar" class="light-gray"></div>
         <div id="frame" class="flex-container">
-            <div class="container-item dark-gray code-area">
-                <textarea id="code" class="dark-gray code-font"></textarea>
+            <div class="container-item dark-gray code-area flex-container">
+                <div id="line-container" class="dense-gray">
+                    <div class="line-no font-mono">1</div>
+                </div>
+                <textarea id="code"
+                    class="dark-gray code-font container-item font-mono"
+                    spellcheck="false"></textarea>
             </div>
             <div class="container-item gray"></div>
         </div>
