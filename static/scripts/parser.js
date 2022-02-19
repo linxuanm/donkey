@@ -223,7 +223,7 @@ const lang = P.createLanguage({
             ['cond', r.Exp],
             P.whitespace,
             P.string('then'),
-            P.whitespace,
+            r.LineDiv,
             ['if', r.Stmt.sepBy(P.whitespace)]
         );
     },
@@ -241,6 +241,9 @@ const lang = P.createLanguage({
     },
     ExpStmt: r => r.Exp,
     Global: r => {
-        return P.alt(r.Stmt).sepBy(P.newline.trim(P.regexp(/( |\t)*/)));
+        return P.alt(r.Stmt).sepBy(r.LineDiv);
+    },
+    LineDiv: r => {
+        return P.newline.trim(P.regexp(/( |\t)*/));
     }
 });

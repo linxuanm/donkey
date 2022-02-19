@@ -8,7 +8,7 @@ textarea {
     border: 0;
 }
 
-#action-bar {
+#title-bar {
     width: 100%;
     flex: 0 0 50px;
 }
@@ -36,6 +36,25 @@ textarea {
 #status-bar {
     flex: 0 0 25px;
     line-height: 25px;
+}
+
+.title-bar-item {
+    margin: 0 75px 0 75px;
+}
+
+.ide-name {
+    color: #0078CE;
+    font-family: Courier;
+    font-size: 30px;
+    line-height: 50px;
+    letter-spacing: 5px;
+}
+
+.ide-text {
+    color: #D4D4D4;
+    font-family: Courier;
+    font-size: 30px;
+    line-height: 50px;
 }
 
 .bar-left {

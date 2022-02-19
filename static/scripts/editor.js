@@ -81,8 +81,11 @@ $(function() {
                 value.substring(end)
             );
             this.selectionStart = this.selectionEnd = start + indent.length + 1;
+            
+            // scroll to caret
             codeArea.blur();
             codeArea.focus();
+
             $(this).trigger('input');
         } else if (e.keyCode === 8) { // backspace
             if (start !== end || start === 0) return;
