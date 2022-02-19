@@ -7,13 +7,16 @@
 		<link rel='stylesheet' href='static/styles/style.css'>
     </head>
     <body class="flex-container vert-flex">
+        <!-- yea ik bad code but safari flex messed up and im lazy lol -->
         <div id="action-bar" class="light-gray flex-item"></div>
         <div class="flex-container flex-item">
-            <div class="flex-container flex-item vert-flex">
-                <div class="flex-item dark-gray code-area flex-container">
-                    <div id="line-container" class="dense-gray dark-border">
-                        <div class="line-no font-mono no-select">
-                            <span class="line-no-inner">1</span>
+            <div class="flex-container flex-item vert-flex outer-half">
+                <div class="flex-item dark-gray flex-container">
+                    <div id="line-container-outer" class="flex-container vert-flex">
+                        <div id="line-container" class="dense-gray dark-border">
+                            <div class="line-no font-mono">
+                                <span class="line-no-inner no-select">1</span>
+                            </div>
                         </div>
                     </div>
                     <textarea id="code"

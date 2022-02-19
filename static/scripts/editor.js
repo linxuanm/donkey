@@ -13,7 +13,7 @@ function updateLineNo(container, num) {
         for (var i = 1; i <= diff; i++) {
             const div = $('<div>', {class: 'line-no font-mono'});
             const span = $('<span>', {
-                class: 'line-no-inner', text: children.length + i
+                class: 'line-no-inner no-select', text: children.length + i
             });
             div.append(span);
             container.append(div);
@@ -81,6 +81,8 @@ $(function() {
                 value.substring(end)
             );
             this.selectionStart = this.selectionEnd = start + indent.length + 1;
+            codeArea.blur();
+            codeArea.focus();
             $(this).trigger('input');
         } else if (e.keyCode === 8) { // backspace
             if (start !== end || start === 0) return;
