@@ -1,3 +1,6 @@
+const config = {
+    tabSize: 4
+};
 const editorInfo = {
     lineNo: 1
 };
@@ -33,6 +36,27 @@ $(function() {
         if (editorInfo.lineNo !== codeLength) {
             editorInfo.lineNo = codeLength;
             updateLineNo(container, editorInfo.lineNo);
+        }
+    });
+
+    codeArea.on('scroll', function() {
+        container.scrollTop(codeArea.scrollTop());
+    });
+
+    codeArea.keydown(function(e) {
+        if (e.keyCode === 9) { // tab
+            e.preventDefault();
+
+            const start = this.selectionStart;
+            const end = this.selectionStart;
+            const value = $(this).val();
+
+            $(this).val(
+                value.substring(0, start) +
+                ' '.repeat(config.tabSize) +
+                value.substring(end)
+            );
+            this.selectionStart = this.selectionEnd = start + config.tabSize;
         }
     });
 });
