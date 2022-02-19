@@ -44,21 +44,25 @@ $(function() {
     });
 
     codeArea.keydown(function(e) {
-        if (e.keyCode !== 9 && e.keyCode !== 13) return;
+        if (e.keyCode !== 9 && e.keyCode !== 13 && e.keyCode !== 8) return;
 
-        e.preventDefault();
+        const cmd = (navigator.platform.includes("Mac") ? e.metaKey : e.ctrlKey);
         const start = this.selectionStart;
         const end = this.selectionEnd;
         const value = $(this).val();
 
         if (e.keyCode === 9) { // tab
+            e.preventDefault();
+
             $(this).val(
                 value.substring(0, start) +
                 ' '.repeat(config.tabSize) +
                 value.substring(end)
             );
             this.selectionStart = this.selectionEnd = start + config.tabSize;
-        } else if (e.keyCode === 13) { // enter
+        } else if (e.keyCode === 13) { // return
+            e.preventDefault();
+
             const lines = value.substring(0, start).split(/\r|\r\n|\n/);
             const last = lines[lines.length - 1];
             const indent = last.match(/^ */)[0];
@@ -69,6 +73,28 @@ $(function() {
             );
             this.selectionStart = this.selectionEnd = start + indent.length + 1;
             $(this).trigger('input');
+        } else if (e.keyCode === 8) { // backspace
+            if (start !== end || start === 0) return;
+            if (value[start - 1] !== ' ' && !cmd) return;
+
+            const lines = value.substring(0, start).split(/\r|\r\n|\n/);
+            const last = lines[lines.length - 1];
+            if (last === '') { // prevent delete all
+                if (cmd) e.preventDefault();
+                return;
+            }
+
+            if (value[start - 1] === ' ' && last.trim() === '' && !cmd) {
+                let amount = last.length % config.tabSize;
+                if (amount === 0) amount = config.tabSize;
+
+                $(this).val(
+                    value.substring(0, start - amount) + value.substring(start)
+                );
+
+                this.selectionStart = this.selectionEnd = start - amount;
+                e.preventDefault();
+            }
         }
     });
 });

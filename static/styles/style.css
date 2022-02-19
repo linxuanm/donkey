@@ -44,11 +44,11 @@ textarea {
 }
 
 .bar-left {
-    left: 10px;
+    text-align: left;
 }
 
 .bar-right {
-    right: 10px;
+    text-align: right;
 }
 
 .no-select {
@@ -130,4 +130,8 @@ textarea {
 .flex-item {
     flex-grow: 1;
     padding: 0;
+}
+
+.status-item {
+    padding: 0 20px 0 20px;
 }
