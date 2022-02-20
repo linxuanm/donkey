@@ -40,6 +40,33 @@ textarea {
 
 #action-bar {
     flex: 0 0 65px;
+    border-right: 2px solid #404040;
+}
+
+.action-icon-container {
+    align-self: flex-start;
+    width: 100%;
+    text-align: center;
+    padding: 15px 0 15px 0;
+    border-left: none;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.action-icon-container:hover {
+    border-left: 2px solid #0078CE;
+}
+
+.action-icon {
+    height: 35px;
+    transition: 0.2s;
+    filter: invert(30%) sepia(80%) saturate(2826%) hue-rotate(188deg)
+            brightness(91%) contrast(101%);
+}
+
+.action-icon-container:hover .action-icon {
+    filter: invert(56%) sepia(75%) saturate(2228%) hue-rotate(175deg)
+            brightness(101%) contrast(87%);
 }
 
 .title-bar-item {

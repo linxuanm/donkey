@@ -1,7 +1,7 @@
 const P = Parsimmon;
 
 const _ = P.optWhitespace;
-const iden = P.regexp(/[A-Z]+/);
+const iden = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
 
