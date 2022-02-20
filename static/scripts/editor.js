@@ -26,14 +26,15 @@ function stopCode() {
 
 function toggleClick(btn, panel) {
     btn.click(e => {
-        if (panel.is(':visible')) {
+        if (panel.css('flex-grow') !== '0') {
             btn.css('border-left-color', '#D4D4D4');
             btn.css('border-bottom', 'none');
+            panel.css('flex-grow', '0');
         } else {
             btn.css('border-left-color', '#0078CE');
             btn.css('border-bottom', '1px solid #404040');
+            panel.css('flex-grow', '1');
         }
-        panel.toggle();
     })
 }
 
