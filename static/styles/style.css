@@ -68,7 +68,7 @@ textarea {
 }
 
 .full-h-panel {
-    width: 100%;
+    min-width: 100%;
 }
 
 .run-action {
@@ -155,7 +155,6 @@ textarea {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    cursor: default;
 }
 
 .font-mono {

@@ -3,8 +3,6 @@ const config = {
 };
 const editorInfo = {
     lineNo: 1,
-    outputOpen: true,
-    debugOpen: true
 };
 
 function runCode() {
@@ -144,4 +142,10 @@ $(function() {
     $('#run-code').click(runCode);
     $('#debug-code').click(debugCode);
     $('#stop-code').click(stopCode);
+    $('#output-btn').click(e => {
+        $('#output-panel').toggle();
+    });
+    $('#debug-btn').click(e => {
+        $('#debugger-panel').toggle();
+    });
 });
