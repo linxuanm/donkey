@@ -2,8 +2,29 @@ const config = {
     tabSize: 4
 };
 const editorInfo = {
-    lineNo: 1
+    lineNo: 1,
+    outputOpen: true,
+    debugOpen: true
 };
+
+function runCode() {
+    updateStatusText('Executing');
+    $('.main-action').hide();
+    $('.run-action').show();
+}
+
+function debugCode() {
+    updateStatusText('Debugging');
+    $('.main-action').hide();
+    $('.debug-action').show();
+}
+
+function stopCode() {
+    updateStatusText('Editing');
+    $('.run-action').hide();
+    $('.debug-action').hide()
+    $('.main-action').show();
+}
 
 function updateLineNo(container, num) {
     const children = container.children();
@@ -26,7 +47,7 @@ function updateLineNo(container, num) {
 }
 
 function updateStatusText(text) {
-
+    $('#status-text').text(text);
 }
 
 function updateCaretPos(line, col) {
@@ -119,4 +140,8 @@ $(function() {
 
         updateCaretPos(lines.length, col);
     });
+
+    $('#run-code').click(runCode);
+    $('#debug-code').click(debugCode);
+    $('#stop-code').click(stopCode);
 });

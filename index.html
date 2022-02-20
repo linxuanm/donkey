@@ -29,30 +29,73 @@
                     <textarea id="code"
                         class="dark-gray code-font flex-item font-mono"
                         spellcheck="false"
-                        wrap="off"></textarea>
+                        wrap="off"
+                    ></textarea>
                 </div>
                 <div id="status-bar" 
                     class="flex-item light-blue no-select flex-container info-font">
                     <div id="caret-pos" class="flex-item status-item bar-left">
                         Line 1, Col 3
                     </div>
-                    <div class="flex-item status-item bar-right">Editing</div>
+                    <div id="status-text"
+                        class="flex-item status-item bar-right"
+                    >Editing</div>
                 </div>
             </div>
             <div class="flex-container flex-item gray">
                 <div id="action-bar" class="flex-container gray vert-flex no-select">
-                    <div class="action-icon-container">
+                    <div
+                        id="run-code"
+                        class="action-icon-container main-action icon-container-blue"
+                    >
                         <img src="static/icons/play.svg"
-                            class="action-icon" draggable="false"
+                            class="action-icon icon-blue" draggable="false"
                         >
                     </div>
-                    <div class="action-icon-container">
+                    <div
+                        id="debug-code"
+                        class="action-icon-container main-action icon-container-blue"
+                    >
                         <img src="static/icons/bug.svg"
-                            class="action-icon" draggable="false"
+                            class="action-icon icon-blue" draggable="false"
+                        >
+                    </div>
+                    <div
+                        id="next-code"
+                        class="action-icon-container debug-action icon-container-blue"
+                    >
+                        <img src="static/icons/arrow.svg"
+                            class="action-icon icon-blue" draggable="false"
+                        >
+                    </div>
+                    <div
+                        id="stop-code"
+                        class="action-icon-container run-action debug-action icon-container-red"
+                    >
+                        <img src="static/icons/square.svg"
+                            class="action-icon icon-red" draggable="false"
                         >
                     </div>
                 </div>
-                <div class="flex-container gray"></div>
+                <div class="flex-container gray vert-flex flex-item">
+                    <div 
+                        class="full-h-panel flex-container vert-flex padded half-v"
+                    >
+                        <div
+                            class="full-h-panel panel-title dense-gray flex-container"
+                        >
+                            <span class="panel-title-text">
+                                Program Output
+                            </span>
+                        </div>
+                        <div class="flex-item full-h-panel dark-gray">
+
+                        </div>
+                    </div>
+                    <div class="flex-item full-h-panel flex-container vert-flex padded">
+
+                    </div>
+                </div>
             </div>
         </div>
 

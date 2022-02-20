@@ -1,3 +1,10 @@
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 html, body {
     margin: 0;
     height: 100vh;
@@ -28,9 +35,6 @@ textarea {
     min-height: 100%;
     padding: 10px 0 20px 0;
     overflow: hidden;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
 }
 
 #status-bar {
@@ -43,30 +47,78 @@ textarea {
     border-right: 2px solid #404040;
 }
 
+.panel-title-text {
+    line-height: 40px;
+    font-family: arial;
+    color: #D4D4D4;
+    font-size: 15px;
+    letter-spacing: 1px;
+    margin: 0 20px 0 20px;
+}
+
+.panel-title {
+    border-left: 2px solid #0078CE;
+    border-bottom: 1px solid #404040;
+    flex: 0 0 40px;
+    cursor: pointer;
+}
+
+.padded {
+    padding: 15px;
+}
+
+.full-h-panel {
+    width: 100%;
+}
+
+.run-action {
+    display: none;
+}
+
+.debug-action {
+    display: none;
+}
+
 .action-icon-container {
     align-self: flex-start;
     width: 100%;
     text-align: center;
     padding: 15px 0 15px 0;
-    border-left: none;
-    transition: 0.2s;
     cursor: pointer;
+    transition: 0.2s;
+    border-left: 2px solid transparent;
 }
 
-.action-icon-container:hover {
+.icon-container-blue:hover {
     border-left: 2px solid #0078CE;
+}
+
+.icon-container-red:hover {
+    border-left: 2px solid #FF3843;
 }
 
 .action-icon {
     height: 35px;
-    transition: 0.2s;
+}
+
+.icon-blue {
     filter: invert(30%) sepia(80%) saturate(2826%) hue-rotate(188deg)
             brightness(91%) contrast(101%);
 }
 
-.action-icon-container:hover .action-icon {
+.icon-red {
+    filter: invert(30%) sepia(81%) saturate(3191%) hue-rotate(339deg)
+            brightness(111%) contrast(104%);
+}
+
+.action-icon-container:hover .icon-blue {
     filter: invert(56%) sepia(75%) saturate(2228%) hue-rotate(175deg)
             brightness(101%) contrast(87%);
+}
+
+.action-icon-container:hover .icon-red {
+    filter: invert(58%) sepia(71%) saturate(5113%) hue-rotate(326deg)
+            brightness(107%) contrast(100%);
 }
 
 .title-bar-item {
@@ -173,9 +225,12 @@ textarea {
     flex-direction: column;
 }
 
+.half-v {
+    height: 50%;
+}
+
 .flex-item {
     flex-grow: 1;
-    padding: 0;
 }
 
 .status-item {
