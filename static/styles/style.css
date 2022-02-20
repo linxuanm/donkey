@@ -57,10 +57,10 @@ textarea {
 }
 
 .panel-title {
-    border-left: 2px solid #0078CE;
-    border-bottom: 1px solid #404040;
     flex: 0 0 40px;
     cursor: pointer;
+    border-left: 2px solid #0078CE;
+    border-bottom: 1px solid #404040;
 }
 
 .padded {

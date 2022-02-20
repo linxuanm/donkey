@@ -24,6 +24,19 @@ function stopCode() {
     $('.main-action').show();
 }
 
+function toggleClick(btn, panel) {
+    btn.click(e => {
+        if (panel.is(':visible')) {
+            btn.css('border-left-color', '#D4D4D4');
+            btn.css('border-bottom', 'none');
+        } else {
+            btn.css('border-left-color', '#0078CE');
+            btn.css('border-bottom', '1px solid #404040');
+        }
+        panel.toggle();
+    })
+}
+
 function updateLineNo(container, num) {
     const children = container.children();
     const diff = num - container.children().length;
@@ -142,10 +155,7 @@ $(function() {
     $('#run-code').click(runCode);
     $('#debug-code').click(debugCode);
     $('#stop-code').click(stopCode);
-    $('#output-btn').click(e => {
-        $('#output-panel').toggle();
-    });
-    $('#debug-btn').click(e => {
-        $('#debugger-panel').toggle();
-    });
+
+    toggleClick($('#output-btn'), $('#output-panel'));
+    toggleClick($('#debug-btn'), $('#debugger-panel'));
 });
