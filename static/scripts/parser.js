@@ -1,6 +1,7 @@
 const P = Parsimmon;
 
-const _ = P.optWhitespace;
+const _ = P.regexp(/( |\t)*/);
+const __ = P.regexp(/( |\t)+/);;
 const iden = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
@@ -90,7 +91,7 @@ class AsnStmt extends Node {
 }
 
 function parens(p, a, b) {
-    return p.trim(_).wrap(P.string(a), P.string(b));
+    return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
 }
 
 function makeUniExp(op, parser) {
@@ -129,7 +130,7 @@ function opParser(precOps, parser) {
 }
 
 function end(s) {
-    return P.string('end').skip(P.whitespace).then(P.string(s));
+    return P.string('end').skip(__).then(P.string(s));
 }
 
 const lang = P.createLanguage({
@@ -167,7 +168,7 @@ const lang = P.createLanguage({
     },
     UniExp: r => {
         return P.alt(
-            makeUniExp(P.string('not').skip(P.whitespace),  r.UniExp),
+            makeUniExp(P.string('not').skip(__),  r.UniExp),
             makeUniExp(P.string('-'), r.UniExp),
             makeUniExp(P.string('!'), r.UniExp),
             r.CompExp
@@ -188,7 +189,7 @@ const lang = P.createLanguage({
         );
     },
     ListExp: r => {
-        return r.Exp.sepBy(P.string(",").trim(_));
+        return r.Exp.sepBy(P.string(",").trim(P.whitespace));
     },
     SimpExp: r => {
         return P.alt(
@@ -219,18 +220,18 @@ const lang = P.createLanguage({
     IfPiece: r => {
         return P.seqObj(
             ['line', P.string('if').mark()],
-            P.whitespace,
+            __,
             ['cond', r.Exp],
-            P.whitespace,
+            __,
             P.string('then'),
             r.LineDiv,
-            ['if', r.Stmt.sepBy(P.whitespace)]
+            ['if', r.Stmt.sepBy(r.LineDiv)]
         );
     },
     ElseIfPiece: r => {
         return P.seqObj(
             P.string('else'),
-            P.whitespace,
+            __,
             ['ifPiece', r.Stmt.IfPiece]
         ).map(e => e.ifPiece);
     },
@@ -244,6 +245,6 @@ const lang = P.createLanguage({
         return P.alt(r.Stmt).sepBy(r.LineDiv);
     },
     LineDiv: r => {
-        return P.newline.trim(P.regexp(/( |\t)*/));
+        return P.newline.trim(_);
     }
 });
