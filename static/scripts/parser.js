@@ -1,18 +1,28 @@
 const P = Parsimmon;
 
-const _ = P.regexp(/( |\t)*/);
-const __ = P.regexp(/( |\t)+/);;
-const iden = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
-const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
-const int = P.regexp(/-?[0-9]+/).map(parseInt);
-
 const ops = [
-    ['*', 'div', 'mod'],
+    ['*', 'div', 'mod', '/', '%'],
     ['+', '-'],
     ['==', '!=', '>=', '<=', '>', '<'],
     ['and'],
     ['or']
 ];
+const keywords = [
+    'if', 'else', 'then', 'do', 'for', 'while',
+    'from', 'to', 'loop', 'input', 'output'
+];
+
+const _ = P.regexp(/( |\t)*/);
+const __ = P.regexp(/( |\t)+/);;
+
+const alphaNum = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
+const iden = alphaNum.assert(
+    s => !keywords.includes(s),
+    `$Identifier name cannot be a keyword`
+);
+
+const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
+const int = P.regexp(/-?[0-9]+/).map(parseInt);
 
 class Node {
 
@@ -239,7 +249,9 @@ const lang = P.createLanguage({
     },
     ElsePiece: r => {
         return P.seqObj(
-            P.string()
+            P.string('else'),
+            r.LineDiv,
+            ['else', r.Stmt.sepBy(r.LineDiv)]
         );
     },
     ExpStmt: r => r.Exp,

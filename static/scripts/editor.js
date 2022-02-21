@@ -36,6 +36,12 @@ function parseAndRun(code, debugMode=false) {
     if (!result.status) {
         const line = result.index.line;
         showError(`Syntax Error: Line ${line}`);
+
+        // '$' is special simple to differentiate info msgs with expected symbols
+        console.log(result.expected);
+        if (result.expected.length === 1 && result.expected[0].startsWith('$')) {
+            showError(result.expected[0].substring(1), false);
+        }
     }
 }
 
