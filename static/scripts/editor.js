@@ -1,3 +1,5 @@
+const COOKIE_NAME = 'code';
+
 const config = {
     tabSize: 4
 };
@@ -6,12 +8,14 @@ const editorInfo = {
 };
 
 function runCode() {
+    saveCode();
     updateStatusText('Executing');
     $('.main-action').hide();
     $('.run-action').show();
 }
 
 function debugCode() {
+    saveCode();
     updateStatusText('Debugging');
     $('.main-action').hide();
     $('.debug-action').show();
@@ -22,6 +26,17 @@ function stopCode() {
     $('.run-action').hide();
     $('.debug-action').hide()
     $('.main-action').show();
+}
+
+function saveCode() {
+    let code = $('#code').val();
+    code = encodeURIComponent(code);
+
+    Cookies.set(COOKIE_NAME, code, { path: '', expires: 365 })
+}
+
+function loadCode() {
+    $('#code').val(Cookies.get(COOKIE_NAME));
 }
 
 function toggleClick(btn, panel) {
@@ -39,6 +54,8 @@ function toggleClick(btn, panel) {
 }
 
 function updateLineNo(container, num) {
+    // TODO: fix potential race condition
+
     const children = container.children();
     const diff = num - container.children().length;
 
@@ -46,7 +63,7 @@ function updateLineNo(container, num) {
         for (var i = 1; i <= diff; i++) {
             const div = $('<div>', {class: 'line-no font-mono'});
             const span = $('<span>', {
-                class: 'line-no-inner no-select', text: children.length + i
+                class: 'line-no-inner', text: children.length + i
             });
             div.append(span);
             container.append(div);
@@ -159,4 +176,6 @@ $(function() {
 
     toggleClick($('#output-btn'), $('#output-panel'));
     toggleClick($('#debug-btn'), $('#debugger-panel'));
+
+    loadCode();
 });

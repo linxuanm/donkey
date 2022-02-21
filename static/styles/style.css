@@ -3,6 +3,12 @@
     -webkit-box-sizing: border-box;
     -ms-box-sizing: border-box;
     box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 html, body {
@@ -13,6 +19,13 @@ html, body {
 textarea {
     resize: none;
     border: 0;
+
+    -webkit-touch-callout: inherit;
+    -webkit-user-select: auto;
+    -khtml-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
 }
 
 #title-bar {
@@ -153,12 +166,7 @@ textarea {
 }
 
 .no-select {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    cursor: default;
 }
 
 .font-mono {
@@ -181,6 +189,7 @@ textarea {
     font-size: 20px;
     line-height: 30px;
     margin: 0 7px 0 7px;
+    cursor: default;
 }
 
 .code-font {

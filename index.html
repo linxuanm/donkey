@@ -22,7 +22,7 @@
                     <div id="line-container-outer" class="flex-container vert-flex">
                         <div id="line-container" class="dense-gray dark-border">
                             <div class="line-no font-mono">
-                                <span class="line-no-inner no-select">1</span>
+                                <span class="line-no-inner">1</span>
                             </div>
                         </div>
                     </div>
@@ -33,17 +33,17 @@
                     ></textarea>
                 </div>
                 <div id="status-bar" 
-                    class="flex-item light-blue no-select flex-container info-font">
-                    <div id="caret-pos" class="flex-item status-item bar-left">
-                        Line 1, Col 3
+                    class="flex-item light-blue flex-container info-font">
+                    <div id="caret-pos" class="flex-item status-item bar-left no-select">
+                        Line 1, Col 0
                     </div>
                     <div id="status-text"
-                        class="flex-item status-item bar-right"
+                        class="flex-item status-item bar-right no-select"
                     >Editing</div>
                 </div>
             </div>
             <div class="flex-container flex-item gray">
-                <div id="action-bar" class="flex-container gray vert-flex no-select">
+                <div id="action-bar" class="flex-container gray vert-flex">
                     <div
                         id="run-code"
                         class="action-icon-container main-action icon-container-blue"
@@ -79,7 +79,7 @@
                 </div>
                 <div class="flex-container gray vert-flex flex-item padded">
                     <div id="output-btn" class="panel-title dense-gray">
-                        <span class="panel-title-text no-select">
+                        <span class="panel-title-text">
                             Program Output
                         </span>
                     </div>
@@ -89,9 +89,9 @@
                     >
 
                     </div>
-                    <br class="no-select">
+                    <br>
                     <div id="debug-btn" class="panel-title dense-gray">
-                        <span class="panel-title-text no-select">
+                        <span class="panel-title-text">
                             Debugger
                         </span>
                     </div>
@@ -105,6 +105,7 @@
             </div>
         </div>
 
+        <script type="text/javascript" src="static/vendors/js.cookie.min.js"></script>
         <script type="text/javascript" src="static/vendors/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="static/vendors/parsimmon.umd.min.js"></script>
         <script type="text/javascript" src="static/scripts/editor.js"></script>
