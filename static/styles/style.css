@@ -19,13 +19,6 @@ html, body {
 textarea {
     resize: none;
     border: 0;
-
-    -webkit-touch-callout: inherit;
-    -webkit-user-select: auto;
-    -khtml-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
 }
 
 #title-bar {
@@ -60,6 +53,15 @@ textarea {
     border-right: 2px solid #404040;
 }
 
+.select {
+    -webkit-touch-callout: inherit;
+    -webkit-user-select: auto;
+    -khtml-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+
 .panel-title-text {
     line-height: 40px;
     font-family: arial;
@@ -82,6 +84,9 @@ textarea {
 
 .full-h-panel {
     min-width: 100%;
+    max-width: 0;
+    overflow-y: scroll;
+    word-break: break-all;
 }
 
 .trans {
@@ -204,6 +209,12 @@ textarea {
     letter-spacing: 1px;
 }
 
+.output-base {
+    font-size: 20px;
+    margin: 5px 0 5px 0;
+    font-family: Courier;
+}
+
 .light-blue {
     background-color: #0078CE;
 }
@@ -242,7 +253,7 @@ textarea {
 }
 
 .flex-item {
-    flex-grow: 1;
+    flex: 1 1 0;
 }
 
 .status-item {

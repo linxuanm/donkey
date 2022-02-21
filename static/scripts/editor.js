@@ -12,6 +12,11 @@ function runCode() {
     updateStatusText('Executing');
     $('.main-action').hide();
     $('.run-action').show();
+
+    $('#output-panel').empty();
+    outputPrint('Program Start', '#00CDAF', true);
+
+    parseAndRun($('#code').val());
 }
 
 function debugCode() {
@@ -19,6 +24,19 @@ function debugCode() {
     updateStatusText('Debugging');
     $('.main-action').hide();
     $('.debug-action').show();
+
+    $('#output-panel').empty();
+    outputPrint('Debugger Start', '#00CDAF', true);
+
+    parseAndRun($('#code').val(), true);
+}
+
+function parseAndRun(code, debugMode=false) {
+    const result = lang.Global.parse(code);
+    if (!result.status) {
+        const line = result.index.line;
+        showError(`Syntax Error: Line ${line}`);
+    }
 }
 
 function stopCode() {
@@ -26,6 +44,19 @@ function stopCode() {
     $('.run-action').hide();
     $('.debug-action').hide()
     $('.main-action').show();
+}
+
+function showError(text, header=true, color='#FF3843') {
+    if (header) {
+        outputPrint(
+            'Your program failed, just like your life',
+            color,
+            true
+        );
+        outputPrint('='.repeat(15), color, true);
+    }
+
+    outputPrint(text, color, true);
 }
 
 function saveCode() {
@@ -45,12 +76,22 @@ function toggleClick(btn, panel) {
             btn.css('border-left-color', '#D4D4D4');
             btn.css('border-bottom', 'none');
             panel.css('flex-grow', '0');
+            panel.css('padding', '0 15px 0 15px');
         } else {
             btn.css('border-left-color', '#0078CE');
             btn.css('border-bottom', '1px solid #404040');
             panel.css('flex-grow', '1');
+            panel.css('padding', '15px');
         }
     })
+}
+
+function outputPrint(text, color='#D4D4D4', bold=false) {
+    $('#output-panel').append($('<div>', {
+        class: 'output-base',
+        text: text,
+        style: `color: ${color};font-weight:${bold ? 'bold' : 'normal'};`,
+    }));
 }
 
 function updateLineNo(container, num) {

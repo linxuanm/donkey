@@ -135,7 +135,9 @@ function end(s) {
 
 const lang = P.createLanguage({
     Stmt: r => {
-        return P.alt(r.AsnStmt);
+        return P.alt(
+            r.AsnStmt
+        );
     },
     AsnStmt: r => {
         return P.seqObj(
@@ -242,9 +244,9 @@ const lang = P.createLanguage({
     },
     ExpStmt: r => r.Exp,
     Global: r => {
-        return P.alt(r.Stmt).sepBy(r.LineDiv);
+        return P.alt(r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
     },
     LineDiv: r => {
-        return P.newline.trim(_);
+        return _.then(P.newline).skip(P.optWhitespace);
     }
 });
