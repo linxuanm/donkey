@@ -9,13 +9,14 @@ const ops = [
 ];
 const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
-    'from', 'to', 'loop', 'input', 'output'
+    'from', 'to', 'loop', 'input', 'output', 'end',
+    'div', 'mod', 'and', 'or'
 ];
 
 const _ = P.regexp(/( |\t)*/);
 const __ = P.regexp(/( |\t)+/);;
 
-const alphaNum = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
+const alphaNum = P.regexp(/[A-Z][a-zA-Z0-9_]*/);
 const iden = alphaNum.assert(
     s => !keywords.includes(s),
     `$Identifier name cannot be a keyword`
@@ -91,12 +92,22 @@ class CallExp extends Exp {
     }
 }
 
-class AsnStmt extends Node {
+class AsnStmt extends Stmt {
 
     constructor(line, name, exp) {
         super(line);
         this.name = name;
         this.exp = exp;
+    }
+}
+
+class IfStmt extends Stmt {
+
+    constructor(line, cond, ifs, elses) {
+        super(line);
+        this.cond = cond;
+        this.ifs = ifs;
+        this.elses = elses;
     }
 }
 
@@ -146,7 +157,8 @@ function end(s) {
 const lang = P.createLanguage({
     Stmt: r => {
         return P.alt(
-            r.AsnStmt
+            r.AsnStmt,
+            r.IfElseStmt
         );
     },
     AsnStmt: r => {
@@ -218,9 +230,6 @@ const lang = P.createLanguage({
             )
         );
     },
-    Stmt: r => {
-        return P.alt(r.AsnStmt);
-    },
     AsnStmt: r => {
         return P.seqMap(
             iden,
@@ -236,22 +245,42 @@ const lang = P.createLanguage({
             ['cond', r.Exp],
             __,
             P.string('then'),
-            r.LineDiv,
-            ['if', r.Stmt.sepBy(r.LineDiv)]
+            ['if', r.LineDiv.then(r.Stmt).many()]
         );
     },
     ElseIfPiece: r => {
         return P.seqObj(
             P.string('else'),
             __,
-            ['ifPiece', r.Stmt.IfPiece]
-        ).map(e => e.ifPiece);
+            ['elif', r.IfPiece]
+        ).map(e => e.elif);
     },
     ElsePiece: r => {
         return P.seqObj(
             P.string('else'),
-            r.LineDiv,
-            ['else', r.Stmt.sepBy(r.LineDiv)]
+            ['else', r.LineDiv.then(r.Stmt).many()]
+        ).map(e => e.else);
+    },
+    IfElseStmt: r => {
+        return P.seqMap(
+            r.IfPiece,
+            r.LineDiv.then(r.ElseIfPiece).many(),
+            r.LineDiv.then(r.ElsePiece).atMost(1),
+            r.LineDiv.then(end('if')),
+            (ifStmt, elifs, elseStmt) => {
+                const genIfPiece = o => {
+                    return new IfStmt(o.line.start, o.cond, o.if, []);
+                }
+                const ifNode = genIfPiece(ifStmt);
+                const elifNodes = elifs.map(genIfPiece);
+
+                return [ifNode, ...elifNodes, ...elseStmt].reduce((a, b) => {
+                    // to match first 'b' (which is a list of stmts)
+                    a.elses = Array.isArray(b) ? b : [b];
+
+                    return a;
+                });
+            }
         );
     },
     ExpStmt: r => r.Exp,

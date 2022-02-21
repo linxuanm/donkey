@@ -34,11 +34,12 @@ function debugCode() {
 function parseAndRun(code, debugMode=false) {
     const result = lang.Global.parse(code);
     if (!result.status) {
+        console.log(result);
+
         const line = result.index.line;
         showError(`Syntax Error: Line ${line}`);
 
         // '$' is special simple to differentiate info msgs with expected symbols
-        console.log(result.expected);
         if (result.expected.length === 1 && result.expected[0].startsWith('$')) {
             showError(result.expected[0].substring(1), false);
         }
@@ -77,6 +78,8 @@ function loadCode() {
 }
 
 function toggleClick(btn, panel) {
+
+    // jQuery toggle doesn't work well with flex... fix this later?
     btn.click(e => {
         if (panel.css('flex-grow') !== '0') {
             btn.css('border-left-color', '#D4D4D4');
