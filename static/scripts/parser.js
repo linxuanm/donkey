@@ -203,6 +203,14 @@ class FuncDecl extends Node {
     }
 }
 
+function getNull(start) {
+    return new LitExp(start, 'null', null);
+}
+
+function dummyLine() {
+    return {offset: 0, line: -1, column: 0};
+}
+
 function parens(p, a, b) {
     return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
 }
@@ -366,7 +374,7 @@ const lang = P.createLanguage({
                 __.then(r.Exp).atMost(1),
                 (l, e) => new RetStmt(
                     l.start,
-                    e.length === 1 ? e[0] : new LitExp(l.start, 'null', null)
+                    e.length === 1 ? e[0] : getNull(l.start)
                 )
             )
         );

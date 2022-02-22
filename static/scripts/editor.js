@@ -44,6 +44,9 @@ function parseAndRun(code, debugMode=false) {
             if (s.startsWith('$')) showError(s.substring(1), false);
         });
     }
+
+    const trans = transpile(result.value);
+    console.log(trans);
 }
 
 function stopCode() {
