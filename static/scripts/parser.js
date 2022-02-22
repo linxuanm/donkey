@@ -10,7 +10,8 @@ const ops = [
 const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
     'from', 'to', 'loop', 'input', 'output', 'end',
-    'div', 'mod', 'and', 'or', 'true', 'false'
+    'div', 'mod', 'and', 'or', 'true', 'false', 'return',
+    'break', 'continue'
 ];
 
 const _ = P.regexp(/( |\t)*/);
@@ -21,8 +22,13 @@ const iden = alphaNum.assert(
     s => !keywords.includes(s),
     `$Identifier name cannot be a keyword`
 );
+// separate in case variable names are set to 'capitalized only'
+// yea weird IB standard ik
+const funcName = alphaNum.assert(
+    s => !keywords.includes(s),
+    `$Identifier name cannot be a keyword`
+);
 
-const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
 const strLit = P.alt(
     P.regexp(/".*?"/),
@@ -344,10 +350,25 @@ const lang = P.createLanguage({
         return P.alt(
             r.OutStmt,
             r.InStmt,
+            r.CtrlStmt,
             r.AsnStmt,
             r.IfElseStmt,
             r.WhileStmt,
             r.ForStmt
+        );
+    },
+    CtrlStmt: r => {
+        return P.alt(
+            P.string('continue').mark().map(e => new ContStmt(e.start)),
+            P.string('break').mark().map(e => new BreakStmt(e.start)),
+            P.seqMap(
+                P.string('return').mark(),
+                __.then(r.Exp).atMost(1),
+                (l, e) => new RetStmt(
+                    l.start,
+                    e.length === 1 ? e[0] : new LitExp(l.start, 'null', null)
+                )
+            )
         );
     },
     InStmt: r => {
