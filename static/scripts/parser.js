@@ -183,6 +183,16 @@ class IdxLHS extends LHS {
     }
 }
 
+class FuncDecl extends Node {
+
+    constructor(line, name, params, stmts) {
+        super(line);
+        this.name = name;
+        this.params = params;
+        this.stmts = stmts;
+    }
+}
+
 function parens(p, a, b) {
     return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
 }
@@ -304,6 +314,27 @@ const lang = P.createLanguage({
             )
         );
     },
+    Func: r => {
+        const parser = P.seqObj(
+            ['name', iden.mark()],
+            _,
+            ['params', parens(
+                iden.sepBy(P.string(',').trim(P.optWhitespace)),
+                '(', ')'
+            )],
+            ['stmts', r.LineDiv.then(r.Stmt).many()]
+        );
+        const msg = '$Functions must be closed with "end <function_name>"';
+        const whole = parser.chain(s => {
+            return r.LineDiv.then(end(s.name.value)).map(e => {
+                return new FuncDecl(
+                    s.name.start, s.name.value, s.params, s.stmts
+                );
+            });
+        });
+
+        return whole;
+    },
     Stmt: r => {
         return P.alt(
             r.OutStmt,
@@ -333,6 +364,9 @@ const lang = P.createLanguage({
             ['params', r.ListExpCont]
         ).map(e => {
             // TODO: type conversions
+            const joined = e.params.reduce((a, b) => {
+                return new BinExp(e.line.start, '+', a, b);
+            });
             const funcExp = new CallExp(e.line.start, '$output', [joined], false);
             return new FuncCallStmt(funcExp);
         });
@@ -419,7 +453,7 @@ const lang = P.createLanguage({
         ).map(e => new ForStmt(e.line.start, e.iter, e.from, e.to, e.stmts));
     },
     Global: r => {
-        return P.alt(r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
+        return P.alt(r.Stmt, r.Func).sepBy(r.LineDiv).skip(P.optWhitespace);
     },
     LineDiv: r => {
         return _.then(P.newline).skip(P.optWhitespace);
