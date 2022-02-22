@@ -34,15 +34,15 @@ function debugCode() {
 function parseAndRun(code, debugMode=false) {
     const result = lang.Global.parse(code);
     console.log(result);
-    
+
     if (!result.status) {
         const line = result.index.line;
         showError(`Syntax Error: Line ${line}`);
 
         // '$' is special simple to differentiate info msgs with expected symbols
-        if (result.expected.length === 1 && result.expected[0].startsWith('$')) {
-            showError(result.expected[0].substring(1), false);
-        }
+        result.expected.map(s => {
+            if (s.startsWith('$')) showError(s.substring(1), false);
+        });
     }
 }
 
@@ -74,7 +74,14 @@ function saveCode() {
 }
 
 function loadCode() {
-    $('#code').val(Cookies.get(COOKIE_NAME));
+    const area = $('#code');
+    const old = Cookies.get(COOKIE_NAME);
+
+    if (old === undefined) return;
+
+    const content = decodeURIComponent(old);
+    area.val(content);
+    updateLineNo(area, content.split('\n').length);
 }
 
 function toggleClick(btn, panel) {
@@ -105,7 +112,6 @@ function outputPrint(text, color='#D4D4D4', bold=false) {
 
 function updateLineNo(container, num) {
     // TODO: fix potential race condition
-
     const children = container.children();
     const diff = num - container.children().length;
 

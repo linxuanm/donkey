@@ -16,7 +16,7 @@ const keywords = [
 const _ = P.regexp(/( |\t)*/);
 const __ = P.regexp(/( |\t)+/);;
 
-const alphaNum = P.regexp(/[A-Z][a-zA-Z0-9_]*/);
+const alphaNum = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const iden = alphaNum.assert(
     s => !keywords.includes(s),
     `$Identifier name cannot be a keyword`
@@ -39,6 +39,10 @@ class Exp extends Node {
 
 class Stmt extends Node {
     // TODO: the code emit thingy
+}
+
+class LHS {
+    // TODO: code emit of storing to place etc
 }
 
 class LitExp extends Exp {
@@ -95,9 +99,9 @@ class CallExp extends Exp {
 
 class AsnStmt extends Stmt {
 
-    constructor(line, name, exp) {
+    constructor(line, lhs, exp) {
         super(line);
-        this.name = name;
+        this.lhs = lhs;
         this.exp = exp;
     }
 }
@@ -118,6 +122,33 @@ class WhileStmt extends Stmt {
         super(line);
         this.cond = cond;
         this.stmts = stmts;
+    }
+}
+
+class ForStmt extends Stmt {
+
+    constructor(line, from, to, stmts) {
+        super(line);
+        this.from = from;
+        this.to = to;
+        this.stmts = stmts;
+    }
+}
+
+class IdenLHS extends LHS {
+
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+}
+
+class IdxLHS extends LHS {
+
+    constructor(exp, idx) {
+        super();
+        this.exp = exp;
+        this.idx = idx;
     }
 }
 
@@ -172,12 +203,16 @@ const lang = P.createLanguage({
             r.WhileStmt
         );
     },
-    AsnStmt: r => {
-        return P.seqObj(
-            ["lhs", iden], _,
-            P.string("="), _,
-            ["rhs", r.Exp]
-        );
+    LHS: r => {
+        return r.Exp.assert(e => {
+            const isIden = e instanceof IdenExp;
+            const isIdx = e instanceof BinExp && e.op === 'index';
+            
+            return isIden || isIdx;
+        }, '$Illegal left-hand-side of assignment').map(e => {
+            if (e instanceof IdenExp) return new IdenLHS(e.name);
+            else if (e instanceof BinExp) return new IdxLHS(e.a, e.b);
+        });
     },
     Exp: r => {
         return opParser(ops, r.UniExp);
@@ -244,7 +279,7 @@ const lang = P.createLanguage({
     },
     AsnStmt: r => {
         return P.seqMap(
-            iden,
+            r.LHS,
             P.string('=').mark().trim(_),
             r.Exp,
             (a, eq, b) => new AsnStmt(eq.start, a, b)
