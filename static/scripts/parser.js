@@ -24,6 +24,10 @@ const iden = alphaNum.assert(
 
 const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
+const strLit = P.alt(
+    P.regexp(/".*?"/),
+    P.regexp(/'.*?'/)
+).map(s => s.slice(1, -1));
 const bool = P.regexp(/true|false/).map(e => e == 'true');
 
 class Node {
@@ -305,9 +309,10 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
-            iden.mark().map(n => new IdenExp(n.start, n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             bool.mark().map(n => new LitExp(n.start, 'bool', n.value)),
+            strLit.mark().map(n => new LitExp(n.start, 'string', n.value)),
+            iden.mark().map(n => new IdenExp(n.start, n.value)),
             parens(r.Exp, "(", ")"),
             parens(r.ListExp, '[', ']').mark().map(
                 e => new LitExp(e.start, 'list', e.value)
