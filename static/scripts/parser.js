@@ -127,11 +127,42 @@ class WhileStmt extends Stmt {
 
 class ForStmt extends Stmt {
 
-    constructor(line, from, to, stmts) {
+    constructor(line, iter, from, to, stmts) {
         super(line);
+        this.iter = iter;
         this.from = from;
         this.to = to;
         this.stmts = stmts;
+    }
+}
+
+class BreakStmt extends Stmt {
+
+    constructor(line) {
+        super(line);
+    }
+}
+
+class ContStmt extends Stmt {
+
+    constructor(line) {
+        super(line);
+    }
+}
+
+class RetStmt extends Stmt {
+
+    constructor(line, exp) {
+        super(line);
+        this.exp = exp;
+    }
+}
+
+class FuncCallStmt extends Stmt {
+
+    constructor(funcExp) {
+        super(funcExp.line);
+        this.funcExp = funcExp;
     }
 }
 
@@ -196,13 +227,6 @@ function end(s) {
 }
 
 const lang = P.createLanguage({
-    Stmt: r => {
-        return P.alt(
-            r.AsnStmt,
-            r.IfElseStmt,
-            r.WhileStmt
-        );
-    },
     LHS: r => {
         return r.Exp.assert(e => {
             const isIden = e instanceof IdenExp;
@@ -259,7 +283,10 @@ const lang = P.createLanguage({
         );
     },
     ListExp: r => {
-        return r.Exp.sepBy(P.string(",").trim(P.whitespace));
+        return r.Exp.sepBy(P.string(",").trim(P.optWhitespace));
+    },
+    ListExpCont: r => {
+        return r.Exp.sepBy(P.string(",").trim(_));
     },
     SimpExp: r => {
         return P.alt(
@@ -276,6 +303,39 @@ const lang = P.createLanguage({
                 e => new LitExp(e.start, 'list', e.value)
             )
         );
+    },
+    Stmt: r => {
+        return P.alt(
+            r.OutStmt,
+            r.InStmt,
+            r.AsnStmt,
+            r.IfElseStmt,
+            r.WhileStmt,
+            r.ForStmt
+        );
+    },
+    InStmt: r => {
+        return P.seqObj(
+            ['line', P.string('input').mark()],
+            _,
+            ['lhs', r.LHS]
+        ).map(e => {
+            return new AsnStmt(
+                e.line.start, e.lhs,
+                new CallExp(e.line.start, '$input', [], false)
+            );
+        });
+    },
+    OutStmt: r => {
+        return P.seqObj(
+            ['line', P.string('output').mark()],
+            _,
+            ['params', r.ListExpCont]
+        ).map(e => {
+            // TODO: type conversions
+            const funcExp = new CallExp(e.line.start, '$output', [joined], false);
+            return new FuncCallStmt(funcExp);
+        });
     },
     AsnStmt: r => {
         return P.seqMap(
@@ -330,7 +390,6 @@ const lang = P.createLanguage({
             }
         );
     },
-    ExpStmt: r => r.Exp,
     WhileStmt: r => {
         return P.seqObj(
             ['line', P.string('loop').mark()],
@@ -341,6 +400,23 @@ const lang = P.createLanguage({
             ['stmts', r.LineDiv.then(r.Stmt).many()],
             r.LineDiv.then(end('loop'))
         ).map(e => new WhileStmt(e.line.start, e.cond, e.stmts));
+    },
+    ForStmt: r => {
+        return P.seqObj(
+            ['line', P.string('loop').mark()],
+            __,
+            ['iter', iden],
+            __,
+            P.string('from'),
+            __,
+            ['from', r.Exp],
+            __,
+            P.string('to'),
+            __,
+            ['to', r.Exp],
+            ['stmts', r.LineDiv.then(r.Stmt).many()],
+            r.LineDiv.then(end('loop'))
+        ).map(e => new ForStmt(e.line.start, e.iter, e.from, e.to, e.stmts));
     },
     Global: r => {
         return P.alt(r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
