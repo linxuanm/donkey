@@ -10,7 +10,7 @@ const ops = [
 const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
     'from', 'to', 'loop', 'input', 'output', 'end',
-    'div', 'mod', 'and', 'or'
+    'div', 'mod', 'and', 'or', 'true', 'false'
 ];
 
 const _ = P.regexp(/( |\t)*/);
@@ -24,6 +24,7 @@ const iden = alphaNum.assert(
 
 const funcName = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
+const bool = P.regexp(/true|false/).map(e => e == 'true');
 
 class Node {
 
@@ -111,6 +112,15 @@ class IfStmt extends Stmt {
     }
 }
 
+class WhileStmt extends Stmt {
+
+    constructor(line, cond, stmts) {
+        super(line);
+        this.cond = cond;
+        this.stmts = stmts;
+    }
+}
+
 function parens(p, a, b) {
     return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
 }
@@ -158,7 +168,8 @@ const lang = P.createLanguage({
     Stmt: r => {
         return P.alt(
             r.AsnStmt,
-            r.IfElseStmt
+            r.IfElseStmt,
+            r.WhileStmt
         );
     },
     AsnStmt: r => {
@@ -222,8 +233,9 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
-            iden,
+            iden.mark().map(n => new IdenExp(n.start, n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
+            bool.mark().map(n => new LitExp(n.start, 'bool', n.value)),
             parens(r.Exp, "(", ")"),
             parens(r.ListExp, '[', ']').mark().map(
                 e => new LitExp(e.start, 'list', e.value)
@@ -274,16 +286,27 @@ const lang = P.createLanguage({
                 const ifNode = genIfPiece(ifStmt);
                 const elifNodes = elifs.map(genIfPiece);
 
-                return [ifNode, ...elifNodes, ...elseStmt].reduce((a, b) => {
+                return [ifNode, ...elifNodes, ...elseStmt].reduceRight((a, b) => {
                     // to match first 'b' (which is a list of stmts)
-                    a.elses = Array.isArray(b) ? b : [b];
+                    b.elses = Array.isArray(a) ? a : [a];
 
-                    return a;
+                    return b;
                 });
             }
         );
     },
     ExpStmt: r => r.Exp,
+    WhileStmt: r => {
+        return P.seqObj(
+            ['line', P.string('loop').mark()],
+            __,
+            P.string('while'),
+            __,
+            ['cond', r.Exp],
+            ['stmts', r.LineDiv.then(r.Stmt).many()],
+            r.LineDiv.then(end('loop'))
+        ).map(e => new WhileStmt(e.line.start, e.cond, e.stmts));
+    },
     Global: r => {
         return P.alt(r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
     },

@@ -33,9 +33,9 @@ function debugCode() {
 
 function parseAndRun(code, debugMode=false) {
     const result = lang.Global.parse(code);
+    console.log(result);
+    
     if (!result.status) {
-        console.log(result);
-
         const line = result.index.line;
         showError(`Syntax Error: Line ${line}`);
 
