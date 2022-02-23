@@ -1,3 +1,14 @@
+class Counter {
+
+    constructor() {
+        this.count = 0;
+    }
+
+    increment(offset=1) {
+        this.count += offset;
+    }
+};
+
 function transpile(code) {
     const funcs = [];
     const funcNames = new Set();
@@ -5,20 +16,13 @@ function transpile(code) {
 
     for (var i of code) {
         if (i instanceof Stmt) {
-            if (i instanceof RetStmt) {
-                throw [
-                    `Structure Error: Line ${i.line}`,
-                    'Return statement outside of function'
-                ];
-            }
-
             mainStmts.push(i);
         } else if (i instanceof FuncDecl) {
             const name = i.name;
             if (PRELUDE_FUNCS_NAME.has(name)) {
                 throw [
-                    `Structure Error: Line ${i.line}`,
-                    `Function name cannot be the same as native functions: ${name}`
+                    `Structure Error: Line ${i.line.line}`,
+                    `Function name conflicts with native function: ${name}`
                 ];
             } else if (funcNames.has(name)) {
                 throw [

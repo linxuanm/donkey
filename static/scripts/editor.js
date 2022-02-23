@@ -39,14 +39,17 @@ function parseAndRun(code, debugMode=false) {
         const line = result.index.line;
         showError(`Syntax Error: Line ${line}`);
 
-        // '$' is special simple to differentiate info msgs with expected symbols
-        result.expected.map(s => {
-            if (s.startsWith('$')) showError(s.substring(1), false);
-        });
+        printError(
+            result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1))
+        );
     }
 
-    const trans = transpile(result.value);
-    console.log(trans);
+    try {
+        const trans = transpile(result.value);
+    } catch (error) {
+        printError(error);
+        return;
+    }
 }
 
 function stopCode() {
@@ -54,6 +57,11 @@ function stopCode() {
     $('.run-action').hide();
     $('.debug-action').hide()
     $('.main-action').show();
+}
+
+function printError(errs) {
+    // '$' is special simple to differentiate info msgs with expected symbols
+    errs.map((s, i) => showError(s, i === 0));
 }
 
 function showError(text, header=true, color='#FF3843') {
