@@ -4,14 +4,14 @@ const ops = [
     ['*', 'div', 'mod', '/', '%'],
     ['+', '-'],
     ['==', '!=', '>=', '<=', '>', '<'],
-    ['and'],
-    ['or']
+    ['AND'],
+    ['OR']
 ];
 const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
     'from', 'to', 'loop', 'input', 'output', 'end',
-    'div', 'mod', 'and', 'or', 'true', 'false', 'return',
-    'break', 'continue'
+    'div', 'mod', 'true', 'false', 'return', 'break',
+    'continue', 'not', 'and', 'or'
 ];
 
 const _ = P.regexp(/( |\t)*/);
@@ -40,6 +40,7 @@ class Node {
 
     constructor(line) {
         this.line = line;
+        this.irCount = 0;
     }
 }
 
@@ -61,6 +62,7 @@ class LitExp extends Exp {
         super(line);
         this.valType = valType;
         this.val = val;
+        this.irCount = 1;
     }
 }
 
@@ -69,6 +71,7 @@ class IdenExp extends Exp {
     constructor(line, name) {
         super(line);
         this.name = name;
+        this.irCount = 1;
     }
 }
 
@@ -79,6 +82,7 @@ class BinExp extends Exp {
         this.op = op;
         this.a = a;
         this.b = b;
+        this.irCount = a.irCount + b.irCount + 1;
     }
 }
 
@@ -88,6 +92,7 @@ class UniExp extends Exp {
         super(line);
         this.op = op;
         this.val = val;
+        this.irCount = val.irCount + 1;
     }
 }
 
@@ -104,6 +109,7 @@ class CallExp extends Exp {
         this.name = name;
         this.params = params;
         this.isMethod = isMethod;
+        this.irCount = params.reduce((a, b) => a + b.irCount, 0) + 1;
     }
 }
 
@@ -113,6 +119,7 @@ class AsnStmt extends Stmt {
         super(line);
         this.lhs = lhs;
         this.exp = exp;
+        this.irCount = lhs.irCount + exp.irCount + 1;
     }
 }
 
@@ -123,6 +130,10 @@ class IfStmt extends Stmt {
         this.cond = cond;
         this.ifs = ifs;
         this.elses = elses;
+
+        const ifLen = stmtLen(ifs);
+        const elseLen = stmtLen(elses);
+        this.irCount = this.cond.irCount + ifLen + elseLen + 2;
     }
 }
 
@@ -132,6 +143,7 @@ class WhileStmt extends Stmt {
         super(line);
         this.cond = cond;
         this.stmts = stmts;
+        this.irCount = cond.irCount + stmtLen(stmts) + 2;
     }
 }
 
@@ -143,6 +155,7 @@ class ForStmt extends Stmt {
         this.from = from;
         this.to = to;
         this.stmts = stmts;
+        this.irCount = from.irCount + to.irCount + stmtLen(stmts) + 5;
     }
 }
 
@@ -150,6 +163,7 @@ class BreakStmt extends Stmt {
 
     constructor(line) {
         super(line);
+        this.irCount = 1;
     }
 }
 
@@ -157,6 +171,7 @@ class ContStmt extends Stmt {
 
     constructor(line) {
         super(line);
+        this.irCount = 1;
     }
 }
 
@@ -165,6 +180,7 @@ class RetStmt extends Stmt {
     constructor(line, exp) {
         super(line);
         this.exp = exp;
+        this.irCount = exp.irCount + 1;
     }
 }
 
@@ -173,6 +189,7 @@ class FuncCallStmt extends Stmt {
     constructor(funcExp) {
         super(funcExp.line);
         this.funcExp = funcExp;
+        this.irCount = funcExp.irCount + 1; // extra pop
     }
 }
 
@@ -181,6 +198,7 @@ class IdenLHS extends LHS {
     constructor(name) {
         super();
         this.name = name;
+        this.irCount = 1;
     }
 }
 
@@ -190,6 +208,7 @@ class IdxLHS extends LHS {
         super();
         this.exp = exp;
         this.idx = idx;
+        this.irCount = exp.irCount + idx.irCount + 1;
     }
 }
 
@@ -252,6 +271,10 @@ function opParser(precOps, parser) {
 
 function end(s) {
     return P.string('end').skip(__).then(P.string(s));
+}
+
+function stmtLen(s) {
+    return s.reduce((a, b) => a + b.irCount, 0);
 }
 
 const lang = P.createLanguage({
@@ -462,12 +485,19 @@ const lang = P.createLanguage({
         return P.seqObj(
             ['line', P.string('loop').mark()],
             __,
-            P.string('while'),
+            ['negate', P.alt(
+                    P.string('while'),
+                    P.string('until')
+                ).map(e => e === 'until')
+            ],
             __,
             ['cond', r.Exp],
             ['stmts', r.LineDiv.then(r.Stmt).many()],
             r.LineDiv.then(end('loop'))
-        ).map(e => new WhileStmt(e.line.start, e.cond, e.stmts));
+        ).map(e => {
+            if (e.negate) e.cond = new UniExp(e.cond.line, 'not', e.cond);
+            return new WhileStmt(e.line.start, e.cond, e.stmts);
+        });
     },
     ForStmt: r => {
         return P.seqObj(
