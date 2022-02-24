@@ -71,7 +71,23 @@ class LitExp extends Exp {
     }
 
     contextPass(context) {
-        throw 'not implemented';
+        this.irPos = context.count;
+        context.increment();
+    }
+}
+
+class ListExp extends Exp {
+
+    constructor(line, arr) {
+        super(line);
+        this.val = arr;
+        this.line = stmtLen(arr) + 1;
+    }
+
+    contextPass(context) {
+        this.val.map(e => e.contextPass(context));
+
+        context.increment();
     }
 }
 
@@ -81,6 +97,10 @@ class IdenExp extends Exp {
         super(line);
         this.name = name;
         this.irCount = 1;
+    }
+
+    contextPass(context) {
+        context.increment();
     }
 }
 
@@ -93,6 +113,13 @@ class BinExp extends Exp {
         this.b = b;
         this.irCount = a.irCount + b.irCount + 1;
     }
+
+    contextPass(context) {
+        this.a.contextPass(context);
+        this.b.contextPass(context);
+
+        context.increment();
+    }
 }
 
 class UniExp extends Exp {
@@ -102,6 +129,11 @@ class UniExp extends Exp {
         this.op = op;
         this.val = val;
         this.irCount = val.irCount + 1;
+    }
+
+    contextPass(context) {
+        this.val.contextPass(context);
+        context.increment();
     }
 }
 
@@ -120,6 +152,11 @@ class CallExp extends Exp {
         this.isMethod = isMethod;
         this.irCount = params.reduce((a, b) => a + b.irCount, 0) + 1;
     }
+
+    contextPass(context) {
+        this.val.params.map(e => e.contextPass(context));
+        context.increment();
+    }
 }
 
 class AsnStmt extends Stmt {
@@ -129,6 +166,12 @@ class AsnStmt extends Stmt {
         this.lhs = lhs;
         this.exp = exp;
         this.irCount = lhs.irCount + exp.irCount + 1;
+    }
+
+    contextPass(context) {
+        this.lhs.contextPass(context);
+        this.val.contextPass(context);
+        context.increment();
     }
 }
 
@@ -143,6 +186,15 @@ class IfStmt extends Stmt {
         const ifLen = stmtLen(ifs);
         const elseLen = stmtLen(elses);
         this.irCount = this.cond.irCount + ifLen + elseLen + 2;
+    }
+
+    contextPass(context) {
+        context.increment();
+        this.elses.map(e => e.contextPass(context));
+        context.increment();
+        this.ifPos = context.count;
+        this.ifs.map(e => e.contextPass(context));
+        this.endPos = context.count;
     }
 }
 
@@ -362,7 +414,7 @@ const lang = P.createLanguage({
             iden.mark().map(n => new IdenExp(n.start, n.value)),
             parens(r.Exp, "(", ")"),
             parens(r.ListExp, '[', ']').mark().map(
-                e => new LitExp(e.start, 'list', e.value)
+                e => new ListExp(e.start, e.value)
             )
         );
     },
