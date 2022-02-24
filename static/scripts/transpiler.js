@@ -2,10 +2,19 @@ class Counter {
 
     constructor() {
         this.count = 0;
+        this.stack = [];
     }
 
     increment(offset=1) {
         this.count += offset;
+    }
+
+    push(scope) {
+        this.stack.push(scope);
+    }
+
+    pop() {
+        return this.stack.pop();
     }
 };
 

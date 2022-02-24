@@ -30,6 +30,7 @@ const funcName = alphaNum.assert(
 );
 
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
+const real = P.regexp(/[+-]?([0-9]+[.])?[0-9]+/).map(parseFloat);
 const strLit = P.alt(
     P.regexp(/".*?"/),
     P.regexp(/'.*?'/)
@@ -41,6 +42,10 @@ class Node {
     constructor(line) {
         this.line = line;
         this.irCount = 0;
+    }
+
+    contextPass(context) {
+        throw 'not implemented';
     }
 }
 
@@ -63,6 +68,10 @@ class LitExp extends Exp {
         this.valType = valType;
         this.val = val;
         this.irCount = 1;
+    }
+
+    contextPass(context) {
+        throw 'not implemented';
     }
 }
 
@@ -346,6 +355,7 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
+            real.mark().map(n => new LitExp(n.start, 'real', n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             bool.mark().map(n => new LitExp(n.start, 'bool', n.value)),
             strLit.mark().map(n => new LitExp(n.start, 'string', n.value)),
