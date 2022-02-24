@@ -36,16 +36,18 @@ function parseAndRun(code, debugMode=false) {
     console.log(result);
 
     if (!result.status) {
-        const line = result.index.line;
+        let line = result.index.line;
+        if (result.index.column === 0) line--;
         showError(`Syntax Error: Line ${line}`);
 
         printError(
-            result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1))
+            result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1)),
+            false
         );
         return;
     }
 
-    try {
+    try {;
         const trans = transpile(result.value);
     } catch (error) {
         printError(error);
@@ -60,9 +62,9 @@ function stopCode() {
     $('.main-action').show();
 }
 
-function printError(errs) {
+function printError(errs, headerFirst=true) {
     // '$' is special simple to differentiate info msgs with expected symbols
-    errs.map((s, i) => showError(s, i === 0));
+    errs.map((s, i) => showError(s, headerFirst && i === 0));
 }
 
 function showError(text, header=true, color='#FF3843') {
