@@ -42,6 +42,7 @@ function parseAndRun(code, debugMode=false) {
         printError(
             result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1))
         );
+        return;
     }
 
     try {

@@ -206,6 +206,20 @@ class WhileStmt extends Stmt {
         this.stmts = stmts;
         this.irCount = cond.irCount + stmtLen(stmts) + 2;
     }
+
+    contextPass(context) {
+        context.push(this);
+
+        context.increment();
+        this.startPos = context.count;
+        this.stmts.map(e => e.contextPass(context));
+        this.contPos = context.count;
+        this.cond.contextPass(context);
+        context.increment();
+        this.breakPos = context.count;
+
+        context.pop(this);
+    }
 }
 
 class ForStmt extends Stmt {
@@ -217,6 +231,10 @@ class ForStmt extends Stmt {
         this.to = to;
         this.stmts = stmts;
         this.irCount = from.irCount + to.irCount + stmtLen(stmts) + 5;
+    }
+
+    contextPass(context) {
+        throw 'implement this later';
     }
 }
 
@@ -345,7 +363,7 @@ const lang = P.createLanguage({
             const isIdx = e instanceof BinExp && e.op === 'index';
             
             return isIden || isIdx;
-        }, '$Illegal left-hand-side of assignment').map(e => {
+        }, 'Illegal left-hand-side of assignment').map(e => {
             if (e instanceof IdenExp) return new IdenLHS(e.name);
             else if (e instanceof BinExp) return new IdxLHS(e.a, e.b);
         });
@@ -428,7 +446,6 @@ const lang = P.createLanguage({
             )],
             ['stmts', r.LineDiv.then(r.Stmt).many()]
         );
-        const msg = '$Functions must be closed with "end <function_name>"';
         const whole = parser.chain(s => {
             return r.LineDiv.then(end(s.name.value)).map(e => {
                 return new FuncDecl(
@@ -444,11 +461,18 @@ const lang = P.createLanguage({
             r.OutStmt,
             r.InStmt,
             r.CtrlStmt,
-            r.AsnStmt,
             r.IfElseStmt,
             r.WhileStmt,
-            r.ForStmt
+            r.ForStmt,
+            r.AsnStmt,
+            r.CallStmt
         );
+    },
+    CallStmt: r => {
+        return r.Exp.assert(
+            e => e instanceof CallExp,
+            'Expression cannot be a statement'
+        ).map(e => new FuncCallStmt(e));
     },
     CtrlStmt: r => {
         return P.alt(
