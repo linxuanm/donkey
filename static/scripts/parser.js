@@ -189,12 +189,16 @@ class IfStmt extends Stmt {
     }
 
     contextPass(context) {
+        context.push(this);
+
         context.increment();
-        this.elses.map(e => e.contextPass(context));
+        this.elses.forEach(e => e.contextPass(context));
         context.increment();
         this.ifPos = context.count;
-        this.ifs.map(e => e.contextPass(context));
+        this.ifs.forEach(e => e.contextPass(context));
         this.endPos = context.count;
+
+        context.pop();
     }
 }
 
@@ -212,7 +216,7 @@ class WhileStmt extends Stmt {
 
         context.increment();
         this.startPos = context.count;
-        this.stmts.map(e => e.contextPass(context));
+        this.stmts.forEach(e => e.contextPass(context));
         this.contPos = context.count;
         this.cond.contextPass(context);
         context.increment();
@@ -244,6 +248,16 @@ class BreakStmt extends Stmt {
         super(line);
         this.irCount = 1;
     }
+
+    contextPass(context) {
+        this.loop = findLoop(context.stack);
+        if (this.loop === null) throw [
+            `Code Structure Error: Line ${this.line}`,
+            '$Break statement outside of loop'
+        ];
+
+        context.increment();
+    }
 }
 
 class ContStmt extends Stmt {
@@ -251,6 +265,16 @@ class ContStmt extends Stmt {
     constructor(line) {
         super(line);
         this.irCount = 1;
+    }
+
+    contextPass(context) {
+        this.loop = findLoop(context.stack);
+        if (this.loop === null) throw [
+            `Code Structure Error: Line ${this.line}`, 
+            '$Continue statement outside of loop'
+        ];
+
+        context.increment();
     }
 }
 
@@ -261,6 +285,17 @@ class RetStmt extends Stmt {
         this.exp = exp;
         this.irCount = exp.irCount + 1;
     }
+
+    contextPass(context) {
+        const func = context[0];
+        if (func.name === '$main') throw [
+            `Code Structure Error: Line ${this.line}`, 
+            '$Return statement outside of function'
+        ];
+
+        this.exp.contextPass(context);
+        context.increment();
+    }
 }
 
 class FuncCallStmt extends Stmt {
@@ -270,6 +305,11 @@ class FuncCallStmt extends Stmt {
         this.funcExp = funcExp;
         this.irCount = funcExp.irCount + 1; // extra pop
     }
+
+    contextPass(context) {
+        this.funcExp.contextPass(context);
+        context.increment();
+    }
 }
 
 class IdenLHS extends LHS {
@@ -277,7 +317,10 @@ class IdenLHS extends LHS {
     constructor(name) {
         super();
         this.name = name;
-        this.irCount = 1;
+    }
+
+    contextPass(context) {
+        context.increment();
     }
 }
 
@@ -289,6 +332,11 @@ class IdxLHS extends LHS {
         this.idx = idx;
         this.irCount = exp.irCount + idx.irCount + 1;
     }
+
+    contextPass(context) {
+        this.exp.contextPass(context);
+        context.increment();
+    }
 }
 
 class FuncDecl extends Node {
@@ -298,6 +346,14 @@ class FuncDecl extends Node {
         this.name = name;
         this.params = params;
         this.stmts = stmts;
+    }
+
+    preprocess(context) {
+        context.push(this);
+
+        stmts.forEach(e => e.contextPass(context));
+
+        context.pop();
     }
 }
 
@@ -354,6 +410,17 @@ function end(s) {
 
 function stmtLen(s) {
     return s.reduce((a, b) => a + b.irCount, 0);
+}
+
+function findLoop(stack) {
+    for (var i = stack.length - 1; i >= 0; i--) {
+        const curr = stack[i];
+        if (curr instanceof WhileStmt || curr instanceof ForStmt) {
+            return curr;
+        }
+    }
+
+    return null;
 }
 
 const lang = P.createLanguage({
