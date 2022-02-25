@@ -37,6 +37,11 @@ const strLit = P.alt(
 ).map(s => s.slice(1, -1));
 const bool = P.regexp(/true|false/).map(e => e == 'true');
 
+/*
+    Normally I don't think its good js pattern to enforce abstract
+    methods and stuff but the IB project requirement kinda stupidly
+    enforces a UML and 'oH eVeRyThInG iS aBsTrAcT' so here goes.
+*/
 class Node {
 
     constructor(line) {
@@ -44,7 +49,7 @@ class Node {
         this.irCount = 0;
     }
 
-    contextPass(context) {
+    codeGen(context) {
         throw 'not implemented';
     }
 }
@@ -58,7 +63,14 @@ class Stmt extends Node {
 }
 
 class LHS {
-    // TODO: code emit of storing to place etc
+
+    preGen(context) {
+        throw 'not implemented';
+    }
+
+    postGen(context) {
+        throw 'not implemented';
+    }
 }
 
 class LitExp extends Exp {
@@ -264,6 +276,12 @@ class IdenLHS extends LHS {
         super();
         this.name = name;
     }
+
+    preGen(context) {}
+
+    postGen(context) {
+
+    }
 }
 
 class IdxLHS extends LHS {
@@ -273,6 +291,14 @@ class IdxLHS extends LHS {
         this.exp = exp;
         this.idx = idx;
         this.irCount = exp.irCount + idx.irCount + 1;
+    }
+
+    preGen(context) {
+
+    }
+
+    postGen(context) {
+        
     }
 }
 

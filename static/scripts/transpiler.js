@@ -1,4 +1,4 @@
-class Counter {
+class CodeGenContext {
 
     constructor() {
         this.count = 0;
