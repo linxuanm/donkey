@@ -1,3 +1,16 @@
+/*
+    Denotes what's conventionally a heap allocated object but
+    that's basically every value in this runtime implementation
+    cuz weeeeeeeeeeeeeeeeeeeeeeeee.
+*/
+class DonkeyObject {
+
+    constructor(type, value) {
+        this.type = type;
+        this.value = value;
+    }
+}
+
 class OpCode {
 
     constructor(line) {
@@ -9,14 +22,14 @@ class OpCode {
     }
 }
 
-class JumpIf extends OpCode {
+class CodeJumpIf extends OpCode {
 
     constructor(line) {
         super(line);
     }
 }
 
-class LoadVar extends OpCode {
+class CodeLoadVar extends OpCode {
 
     constructor(line, name) {
         super(line);
@@ -32,7 +45,7 @@ class LoadVar extends OpCode {
     Yea ik weird design but IB also didn't specify the scoping/referencing
     rules for global variables so imma improvise.
 */
-class StoreVar extends OpCode {
+class CodeStoreVar extends OpCode {
 
     constructor(line, name) {
         super(line);
@@ -40,7 +53,7 @@ class StoreVar extends OpCode {
     }
 }
 
-class Invoke extends OpCode {
+class CodeInvoke extends OpCode {
 
     constructor(line, name, nParams, isMethod=false, isNative=false) {
         super(line);
@@ -51,7 +64,7 @@ class Invoke extends OpCode {
     }
 }
 
-class UnOp extends OpCode {
+class CodeUnOp extends OpCode {
 
     constructor(line, op) {
         super(line);
@@ -59,7 +72,7 @@ class UnOp extends OpCode {
     }
 }
 
-class BinOp extends OpCode {
+class CodeBinOp extends OpCode {
 
     constructor(line, op) {
         super(line);
@@ -67,4 +80,25 @@ class BinOp extends OpCode {
     }
 }
 
+class CodeRet extends OpCode {
 
+    constructor(line) {
+        super(line);
+    }
+}
+
+class CodeConsList extends OpCode {
+    
+    constructor(line, nParams) {
+        super(line);
+        this.nParams = nParams;
+    }
+}
+
+class CodeLoadLit extends OpCode {
+
+    constructor(line, val) {
+        super(line);
+        this.val = val;
+    }
+}

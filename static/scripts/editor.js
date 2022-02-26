@@ -33,7 +33,6 @@ function debugCode() {
 
 function parseAndRun(code, debugMode=false) {
     const result = lang.Global.parse(code);
-    console.log(result);
 
     if (!result.status) {
         let line = result.index.line;

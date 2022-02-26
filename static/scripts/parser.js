@@ -4,8 +4,8 @@ const ops = [
     ['*', 'div', 'mod', '/', '%'],
     ['+', '-'],
     ['==', '!=', '>=', '<=', '>', '<'],
-    ['AND'],
-    ['OR']
+    ['and'],
+    ['or']
 ];
 const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
@@ -81,6 +81,13 @@ class LitExp extends Exp {
         this.val = val;
         this.irCount = 1;
     }
+
+    codeGen(context) {
+        const obj = new DonkeyObject(type, value);
+        context.code.push(new CodeLoadLit(this.line, obj));
+
+        context.increment();
+    }
 }
 
 class ListExp extends Exp {
@@ -89,6 +96,13 @@ class ListExp extends Exp {
         super(line);
         this.val = arr;
         this.line = stmtLen(arr) + 1;
+    }
+
+    codeGen(context) {
+        this.val.forEach(e => e.codeGen(context));
+        context.code.push(new CodeConsList(this.line, this.val.length));
+
+        context.increment();
     }
 }
 
@@ -450,7 +464,7 @@ const lang = P.createLanguage({
             ),
             real.mark().map(n => new LitExp(n.start, 'real', n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
-            bool.mark().map(n => new LitExp(n.start, 'bool', n.value)),
+            bool.mark().map(n => new LitExp(n.start, 'boolean', n.value)),
             strLit.mark().map(n => new LitExp(n.start, 'string', n.value)),
             iden.mark().map(n => new IdenExp(n.start, n.value)),
             parens(r.Exp, "(", ")"),
@@ -626,7 +640,7 @@ const lang = P.createLanguage({
         ).map(e => new ForStmt(e.line.start, e.iter, e.from, e.to, e.stmts));
     },
     Global: r => {
-        return P.alt(r.Stmt, r.Func).sepBy(r.LineDiv).skip(P.optWhitespace);
+        return P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
     },
     LineDiv: r => {
         return _.then(P.newline).skip(P.optWhitespace);

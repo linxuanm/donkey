@@ -3,6 +3,7 @@ class CodeGenContext {
     constructor() {
         this.count = 0;
         this.stack = [];
+        this.code = [];
     }
 
     increment(offset=1) {
@@ -35,8 +36,8 @@ function transpile(code) {
                 ];
             } else if (funcNames.has(name)) {
                 throw [
-                    `Structure Error: Line ${i.line}`,
-                    `Duplication function name: ${name}`
+                    `Structure Error: Line ${i.line.line}`,
+                    `Duplicate function name: ${name}`
                 ];
             }
 
@@ -53,10 +54,12 @@ function transpile(code) {
     );
     funcs.push(mainFunc);
 
+    // ret statement at end of func
     funcs.forEach(e => {
         const stmts = e.stmts;
         if (stmts.length === 0 || !(stmts[stmts.length - 1] instanceof RetStmt)) {
             stmts.push(new RetStmt(dummyLine(), getNull(-1)));
+            e.irCount = stmtLen(stmts);
         }
     });
 
