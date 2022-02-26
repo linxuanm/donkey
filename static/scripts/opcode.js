@@ -114,6 +114,6 @@ class CodeLoadLit extends OpCode {
 class CodePop extends OpCode {
 
     constructor(line) {
-        this.line = line;
+        super(line);
     }
 }

@@ -83,7 +83,7 @@ class LitExp extends Exp {
     }
 
     codeGen(context) {
-        const obj = new DonkeyObject(type, value);
+        const obj = new DonkeyObject(this.valType, this.val);
         context.code.push(new CodeLoadLit(this.line, obj));
     }
 }
@@ -93,7 +93,7 @@ class ListExp extends Exp {
     constructor(line, arr) {
         super(line);
         this.val = arr;
-        this.line = stmtLen(arr) + 1;
+        this.irCount = stmtLen(arr) + 1;
     }
 
     codeGen(context) {
@@ -183,7 +183,7 @@ class AsnStmt extends Stmt {
         super(line);
         this.lhs = lhs;
         this.exp = exp;
-        this.irCount = lhs.irCount + exp.irCount + 1;
+        this.irCount = lhs.irCount + exp.irCount;
     }
 
     codeGen(context) {
@@ -207,6 +207,8 @@ class IfStmt extends Stmt {
     }
 
     codeGen(context) {
+        // TODO: remove jmp if 'else' block is empty
+
         let incre = context.code.length;
         incre += this.cond.irCount;
         incre++;
@@ -311,8 +313,8 @@ class BreakStmt extends Stmt {
     codeGen(context) {
         const loop = findLoop(context.stack);
         if (loop === null) throw [
-            `Code Structure Error: Line ${this.line}`, 
-            '$Break statement outside of loop'
+            `Code Structure Error: Line ${this.line.line}`, 
+            'Break statement outside of loop'
         ];
 
         context.code.push(new CodeJump(this.line, loop.breakLabel));
@@ -329,8 +331,8 @@ class ContStmt extends Stmt {
     codeGen(context) {
         const loop = findLoop(context.stack);
         if (loop === null) throw [
-            `Code Structure Error: Line ${this.line}`, 
-            '$Continue statement outside of loop'
+            `Code Structure Error: Line ${this.line.line}`, 
+            'Continue statement outside of loop'
         ];
 
         context.code.push(new CodeJump(this.line, loop.contLabel));
@@ -348,8 +350,8 @@ class RetStmt extends Stmt {
     codeGen(context) {
         const func = context.stack[0];
         if (func.name === '$main') throw [
-            `Code Structure Error: Line ${this.line}`, 
-            '$Return statement outside of function'
+            `Code Structure Error: Line ${this.line.line}`, 
+            'Return statement outside of function'
         ];
 
         this.exp.codeGen(context);
@@ -364,6 +366,11 @@ class FuncCallStmt extends Stmt {
         this.funcExp = funcExp;
         this.irCount = funcExp.irCount + 1; // extra pop
     }
+
+    codeGen(context) {
+        this.funcExp.codeGen(context);
+        context.code.push(new CodePop(this.line));
+    }
 }
 
 class IdenLHS extends LHS {
@@ -377,7 +384,7 @@ class IdenLHS extends LHS {
     preGen(context) {}
 
     postGen(context) {
-        context.code.push(new CodeStoreVar(this.line, this.name));
+        context.code.push(new CodeStoreVar(dummyLine(), this.name));
     }
 }
 
@@ -387,7 +394,7 @@ class IdxLHS extends LHS {
         super();
         this.exp = exp;
         this.idx = idx;
-        this.irCount = exp.irCount + idx.irCount + 1;
+        this.irCount = exp.irCount + idx.irCount + 2;
     }
 
     preGen(context) {
@@ -396,8 +403,8 @@ class IdxLHS extends LHS {
     }
 
     postGen(context) {
-        context.code.push(new CodeInvoke(this.line, '$setIndex', 3, true));
-        context.code.push(new CodePop(this.line));
+        context.code.push(new CodeInvoke(dummyLine(), '$setIndex', 3, true));
+        context.code.push(new CodePop(dummyLine()));
     }
 }
 
@@ -412,7 +419,14 @@ class FuncDecl extends Node {
     }
 
     codeGen(context) {
+        context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
+        if (!(context.code[context.code.length - 1] instanceof CodeRet)) {
+            const nil = new DonkeyObject('null', null);
+            context.code.push(new CodeLoadLit(dummyLine(), nil));
+        }
+
+        context.pop(this);
     }
 }
 
@@ -420,6 +434,7 @@ function getNull(start) {
     return new LitExp(start, 'null', null);
 }
 
+// returns a dummy line that does not trigger a debugger break
 function dummyLine() {
     return {offset: 0, line: -1, column: 0};
 }

@@ -49,16 +49,18 @@ function transpile(code) {
     );
     funcs.push(mainFunc);
 
-    // ret statement at end of func
-    /*funcs.forEach(e => {
-        const stmts = e.stmts;
-        if (stmts.length === 0 || !(stmts[stmts.length - 1] instanceof RetStmt)) {
-            stmts.push(new RetStmt(dummyLine(), getNull(-1)));
-            e.irCount = stmtLen(stmts);
-        }
-    });*/
+    // console.log(funcs);
+    const packaged = funcs.map(e => {
+        const context = new CodeGenContext();
+        e.codeGen(context);
+        
+        return {
+            name: e.name,
+            params: e.params,
+            code: context.code
+        };
+    });
+    console.log(packaged)
 
-    console.log(funcs);
-
-    return funcs;
+    return packaged;
 }
