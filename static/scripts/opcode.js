@@ -110,3 +110,10 @@ class CodeLoadLit extends OpCode {
         this.val = val;
     }
 }
+
+class CodePop extends OpCode {
+
+    constructor(line) {
+        this.line = line;
+    }
+}

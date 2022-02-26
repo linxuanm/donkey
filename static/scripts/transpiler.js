@@ -1,18 +1,8 @@
 class CodeGenContext {
 
     constructor() {
-        /*
-            TODO: remove 'count' cuz after the one-pass refractor
-            it is always equivalent to the length of the current
-            code list
-        */
-        this.count = 0;
-        this.stack = [];
+        this.stack = []; // scope stack
         this.code = [];
-    }
-
-    increment(offset=1) {
-        this.count += offset;
     }
 
     push(scope) {
@@ -60,13 +50,15 @@ function transpile(code) {
     funcs.push(mainFunc);
 
     // ret statement at end of func
-    funcs.forEach(e => {
+    /*funcs.forEach(e => {
         const stmts = e.stmts;
         if (stmts.length === 0 || !(stmts[stmts.length - 1] instanceof RetStmt)) {
             stmts.push(new RetStmt(dummyLine(), getNull(-1)));
             e.irCount = stmtLen(stmts);
         }
-    });
+    });*/
+
+    console.log(funcs);
 
     return funcs;
 }
