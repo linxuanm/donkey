@@ -113,6 +113,11 @@ class IdenExp extends Exp {
         this.name = name;
         this.irCount = 1;
     }
+
+    codeGen(context) {
+        context.code.push(new CodeLoadVar(this.line, this.name));
+        context.increment();
+    }    
 }
 
 class BinExp extends Exp {
@@ -124,6 +129,14 @@ class BinExp extends Exp {
         this.b = b;
         this.irCount = a.irCount + b.irCount + 1;
     }
+
+    codeGen(context) {
+        this.a.codeGen(context);
+        this.b.codeGen(context);
+
+        context.code.push(new CodeBinOp(this.line, this.op));
+        context.increment();
+    }  
 }
 
 class UniExp extends Exp {
@@ -133,6 +146,13 @@ class UniExp extends Exp {
         this.op = op;
         this.val = val;
         this.irCount = val.irCount + 1;
+    }
+
+    codeGen(context) {
+        this.val.codeGen(context);
+
+        context.code.push(new CodeUnOp(this.line, this.op));
+        context.increment();
     }
 }
 
@@ -151,6 +171,18 @@ class CallExp extends Exp {
         this.isMethod = isMethod;
         this.irCount = params.reduce((a, b) => a + b.irCount, 0) + 1;
     }
+
+    codeGen(context) {
+        this.params.forEach(e => e.codeGen(context));
+
+        context.code.push(
+            new CodeInvoke(
+                this.line, this.name,
+                this.params.length, this.isMethod
+            )
+        );
+        context.increment();
+    }
 }
 
 class AsnStmt extends Stmt {
@@ -160,6 +192,12 @@ class AsnStmt extends Stmt {
         this.lhs = lhs;
         this.exp = exp;
         this.irCount = lhs.irCount + exp.irCount + 1;
+    }
+
+    codeGen(context) {
+        this.lhs.preGen(context);
+        this.exp.codeGen(context);
+        this.lhs.postGen(context);
     }
 }
 
@@ -171,23 +209,46 @@ class IfStmt extends Stmt {
         this.ifs = ifs;
         this.elses = elses;
 
-        const ifLen = stmtLen(ifs);
-        const elseLen = stmtLen(elses);
-        this.irCount = this.cond.irCount + ifLen + elseLen + 2;
+        this.ifLen = stmtLen(ifs);
+        this.elseLen = stmtLen(elses);
+        this.irCount = this.cond.irCount + this.ifLen + this.elseLen + 2;
     }
 
-    /*contextPass(context) {
+    codeGen(context) {
+        let incre = context.count;
+        incre += this.cond.irCount;
+        incre++;
+        incre += this.elseLen;
+        incre++;
+        this.ifLabel = incre;
+        incre += this.ifLen;
+        this.endLabel = incre;
+
+        this.cond.codeGen(context);
+        context.code.push(new CodeJumpIf(this.line, this.ifLabel));
+        context.increment();
         context.push(this);
 
+        this.elses.forEach(e => e.codeGen(context));
+        context.code.push(new CodeJump(this.line, this.endLabel));
         context.increment();
-        this.elses.forEach(e => e.contextPass(context));
-        context.increment();
-        this.ifPos = context.count;
-        this.ifs.forEach(e => e.contextPass(context));
-        this.endPos = context.count;
+
+        this.ifs.forEach(e => e.codeGen(context));
 
         context.pop();
-    }*/
+    }
+
+    /*
+        <exp code>
+        <jumpIf to ifLabel>
+        [<else code>]
+        <jump to endLabel>
+
+        ifLabel:
+        [<if code>]
+
+        endLabel:
+    */
 }
 
 class WhileStmt extends Stmt {
@@ -196,22 +257,38 @@ class WhileStmt extends Stmt {
         super(line);
         this.cond = cond;
         this.stmts = stmts;
-        this.irCount = cond.irCount + stmtLen(stmts) + 2;
+
+        this.stmtLen = stmtLen(stmts);
+        this.irCount = cond.irCount + this.stmtLen + 2;
     }
 
-    /*contextPass(context) {
-        context.push(this);
+    codeGen(context) {
+        let incre = context.count;
+        incre++;
 
-        context.increment();
-        this.startPos = context.count;
-        this.stmts.forEach(e => e.contextPass(context));
-        this.contPos = context.count;
-        this.cond.contextPass(context);
-        context.increment();
-        this.breakPos = context.count;
+        this.repLabel = incre;
+        this.incre += this.stmtLen;
 
-        context.pop(this);
-    }*/
+        this.contLabel = incre;
+        incre += this.cond.irCount;
+        incre++;
+        this.breakLabel = incre;
+
+        //this.stmts.forEach(e => e.codeGen(context));
+    }
+
+    /*
+        <jump to contLabel>
+        
+        repLabel:
+        [<stmt code>]
+
+        contLabel:
+        <expCode>
+        <jumpIf to repLabel>
+
+        breakLabel:
+    */
 }
 
 class ForStmt extends Stmt {

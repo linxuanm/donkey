@@ -22,10 +22,19 @@ class OpCode {
     }
 }
 
+class CodeJump extends OpCode {
+
+    constructor(line, target) {
+        super(line);
+        this.target = target;
+    }
+}
+
 class CodeJumpIf extends OpCode {
 
-    constructor(line) {
+    constructor(line, target) {
         super(line);
+        this.target = target;
     }
 }
 
@@ -55,12 +64,11 @@ class CodeStoreVar extends OpCode {
 
 class CodeInvoke extends OpCode {
 
-    constructor(line, name, nParams, isMethod=false, isNative=false) {
+    constructor(line, name, nParams, isMethod=false) {
         super(line);
         this.name = name;
         this.nParams = nParams;
         this.isMethod = isMethod;
-        this.isNative = isNative;
     }
 }
 

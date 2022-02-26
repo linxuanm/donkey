@@ -1,6 +1,11 @@
 class CodeGenContext {
 
     constructor() {
+        /*
+            TODO: remove 'count' cuz after the one-pass refractor
+            it is always equivalent to the length of the current
+            code list
+        */
         this.count = 0;
         this.stack = [];
         this.code = [];
