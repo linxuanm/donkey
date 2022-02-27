@@ -158,10 +158,7 @@ class DonkeyRuntime {
 
         this.funcs = {};
         for (var i of funcs) {
-            this.funcs[i.name] = {
-                params: i.params,
-                code: i.code
-            };
+            this.funcs[i.name] = new CodeFunction(i.params, i.code);
         }
     }
 
