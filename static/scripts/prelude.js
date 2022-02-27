@@ -33,6 +33,10 @@ const UN_OP = {
     }
 };
 
+const METHODS = {
+    
+};
+
 const uniNum = x => x === 'integer' || x === 'real';
 const isNum = (at, bt) => uniNum(at) && uniNum(bt);
 const isBool = (at, bt) => at === 'boolean' && bt === 'boolean';
@@ -42,7 +46,7 @@ const BIN_OP = {
         verify: (a, b) => {
             return isNum(a, b) ||
                    a === 'string' && b === 'string' ||
-                   a === 'list' && b === 'list';
+                   a === 'List' && b === 'List';
         },
         calc: (a, b) => {
             if (isNum(a.type, b.type)) {
@@ -114,7 +118,7 @@ const BIN_OP = {
         calc: (a, b) => BOOL(a.value || b.value)
     },
     'index': {
-        verify: (a, b) => a === 'list' && b === 'integer',
+        verify: (a, b) => a === 'List' && b === 'integer',
         calc: (a, b, line) => {
             if (b.value >= a.value.length) {
                 throw [
@@ -137,13 +141,13 @@ function toString(exp) {
             return exp.value.toString();
         case 'string':
             return exp.value;
-        case 'list':
+        case 'List':
             return `[${exp.value.map(toString).join(', ')}]`;
         case 'null':
             return 'null';
-        case 'stack':
-        case 'queue':
-        case 'collection':
+        case 'Stack':
+        case 'Queue':
+        case 'Collection':
             return `${exp.type}[${exp.value.map(toString).join(', ')}]`;
     }
 

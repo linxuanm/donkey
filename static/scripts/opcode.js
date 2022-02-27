@@ -1,3 +1,16 @@
+function loadVar(name, vm, frame, line) {
+    if (name in frame.locals) {
+        return frame.locals[name];
+    } else if (name in vm.mainEnv) {
+        return vm.mainEnv[name];
+    } else {
+        throw [
+            `Name Error: Line ${line.line}`,
+            `Variable '${name}' is undefined`
+        ];
+    }
+}
+
 class OpCode {
 
     constructor(line) {
@@ -42,16 +55,7 @@ class CodeLoadVar extends OpCode {
     }
 
     execute(vm, frame) {
-        if (this.name in frame.locals) {
-            vm.push(frame.locals[this.name]);
-        } else if (this.name in vm.mainEnv) {
-            vm.push(vm.mainEnv[this.name]);
-        } else {
-            throw [
-                `Name Error: Line ${this.line.line}`,
-                `Variable '${this.name}' is undefined`
-            ];
-        }
+        vm.push(loadVar(this.name, vm, frame, this.line));
     }
 }
 
@@ -232,5 +236,20 @@ class CodeForTest extends OpCode {
     constructor(line, name) {
         super(line);
         this.name = name;
+    }
+
+    execute(vm, frame) {
+        const top = vm.pop();
+        vm.push(top);
+
+        const ref = loadVar(this.name, vm, frame, this.line);
+        if (!BIN_OP['<='].verify(ref.type, top.type)) {
+            throw [
+                `Type Error: Line ${this.line.line}`,
+                `For loop requires numeric bounds, but has acculator \
+                of type ${ref.type} and target value of type ${top.type}`
+            ];
+        }
+        vm.push(BIN_OP['<='].calc(ref, top));
     }
 }

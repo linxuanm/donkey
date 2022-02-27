@@ -3,7 +3,7 @@ function NULL() {
 }
 
 function LIST(arr) {
-    return new DonkeyObject('list', arr);
+    return new DonkeyObject('List', arr);
 }
 
 function STR(str) {

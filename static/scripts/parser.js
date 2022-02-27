@@ -338,13 +338,13 @@ class ForStmt extends Stmt {
         this.stmts.forEach(e => e.codeGen(context));
         context.pop(this);
 
-        context.code.push(new CodeLoadVar(dummyLine(), this.iter));
+        context.code.push(new CodeLoadVar(this.line, this.iter));
         const one = new DonkeyObject('integer', 1);
         context.code.push(new CodeLoadLit(dummyLine(), one));
         context.code.push(new CodeBinOp(dummyLine(), '+'));
         context.code.push(new CodeStoreVar(dummyLine(), this.iter));
 
-        context.code.push(new CodeForTest(dummyLine(), this.iter));
+        context.code.push(new CodeForTest(this.line, this.iter));
         context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
 
         context.code.push(new CodePop(dummyLine()));
