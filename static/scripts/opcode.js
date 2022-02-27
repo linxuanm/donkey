@@ -9,6 +9,39 @@ class DonkeyObject {
         this.type = type;
         this.value = value;
     }
+
+    /*
+        Primitives (real, boolean, int, string) are passed by value
+        while other ones are passed by reference. This is simulated
+        by just duplicating an instance of a primitive. Primitive
+        types have lower case type names (as lazy as that is).
+
+        Note that when defining a primitive type, make sure its
+        value is passed-by-value in javascript.
+    */
+    copy() {
+        const char = this.type.charAt(0);
+        if (char === char.toUpperCase()) {
+            return this;
+        }
+        return new DonkeyObject(this.type, this.value);
+    }
+
+    assertType(s, msg, line) {
+        if (s !== this.type) throw [
+            `Type Error: Line ${line.line}`,
+            msg
+        ];
+    }
+
+    bool(line) {
+        this.assertType(
+            'boolean',
+            `Type ${this.type} cannot be interpreted as a boolean`,
+            line
+        );
+        return this.value;
+    }
 }
 
 class OpCode {
@@ -17,7 +50,7 @@ class OpCode {
         this.line = line;
     }
 
-    execute(vm) {
+    execute(vm, frame) {
         throw 'not implemented';
     }
 }
@@ -28,6 +61,10 @@ class CodeJump extends OpCode {
         super(line);
         this.target = target;
     }
+
+    execute(vm, frame) {
+        frame.pc = this.target;
+    }
 }
 
 class CodeJumpIf extends OpCode {
@@ -36,6 +73,11 @@ class CodeJumpIf extends OpCode {
         super(line);
         this.target = target;
     }
+
+    execute(vm, frame) {
+        const top = vm.pop();
+        if (top.bool()) frame.pc = this.target;
+    }
 }
 
 class CodeLoadVar extends OpCode {
@@ -43,6 +85,19 @@ class CodeLoadVar extends OpCode {
     constructor(line, name) {
         super(line);
         this.name = name;
+    }
+
+    execute(vm, frame) {
+        if (this.name in frame.locals) {
+            vm.push(frame.locals[this.name]);
+        } else if (this.name in vm.mainEnv) {
+            vm.push(vm.mainEnv[this.name]);
+        } else {
+            throw [
+                `Name Error: Line ${this.line.line}`,
+                `Variable '${this.name}' is undefined`
+            ];
+        }
     }
 }
 
@@ -60,6 +115,14 @@ class CodeStoreVar extends OpCode {
         super(line);
         this.name = name;
     }
+
+    execute(vm, frame) {
+        if (this.name in vm.mainEnv) {
+            vm.mainEnv[this.name] = vm.pop();
+        } else {
+            frame.locals[this.name] = vm.pop();
+        }
+    }
 }
 
 class CodeInvoke extends OpCode {
@@ -69,6 +132,17 @@ class CodeInvoke extends OpCode {
         this.name = name;
         this.nParams = nParams;
         this.isMethod = isMethod;
+    }
+
+    execute(vm, frame) {
+        let func;
+        if (this.isMethod) {
+
+        } else if (this.name in vm.funcs) {
+            func = vm.funcs[this.name];
+        } else if (this.name in NATIVE_FUNCS) {
+            func = NATIVE_FUNCS[this.name];
+        }
     }
 }
 

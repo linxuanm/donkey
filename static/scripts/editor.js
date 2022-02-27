@@ -43,6 +43,7 @@ function parseAndRun(code, debugMode=false) {
             result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1)),
             false
         );
+        stopCode();
         return;
     }
 
@@ -51,13 +52,19 @@ function parseAndRun(code, debugMode=false) {
         trans = transpile(result.value);
     } catch (error) {
         printError(error);
+        stopCode();
         return;
     }
 
     const runtime = loadRuntime(trans);
     // TODO: thread this
     const runCode = () => {
-        runtime.runMain();
+        try {
+            runtime.runMain();
+        } catch (error) {
+            printError(error);
+            stopCode();
+        }
     };
     runCode();
 }
