@@ -219,11 +219,11 @@ class IfStmt extends Stmt {
         this.endLabel = incre;
 
         this.cond.codeGen(context);
-        context.code.push(new CodeJumpIf(this.line, this.ifLabel));
+        context.code.push(new CodeJumpIf(dummyLine(), this.ifLabel));
         context.push(this);
 
         this.elses.forEach(e => e.codeGen(context));
-        context.code.push(new CodeJump(this.line, this.endLabel));
+        context.code.push(new CodeJump(dummyLine(), this.endLabel));
 
         this.ifs.forEach(e => e.codeGen(context));
 
@@ -266,11 +266,11 @@ class WhileStmt extends Stmt {
         incre++;
         this.breakLabel = incre;
 
-        context.code.push(new CodeJump(this.line, this.contLabel));
+        context.code.push(new CodeJump(dummyLine(), this.contLabel));
         this.stmts.forEach(e => e.codeGen(context));
 
         this.cond.codeGen(context);
-        context.code.push(new CodeJumpIf(this.line, this.repLabel));
+        context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
     }
 
     /*
@@ -426,7 +426,7 @@ class FuncCallStmt extends Stmt {
 
     codeGen(context) {
         this.funcExp.codeGen(context);
-        context.code.push(new CodePop(this.line));
+        context.code.push(new CodePop(dummyLine()));
     }
 }
 
@@ -481,6 +481,7 @@ class FuncDecl extends Node {
         if (!(context.code[context.code.length - 1] instanceof CodeRet)) {
             const nil = new DonkeyObject('null', null);
             context.code.push(new CodeLoadLit(dummyLine(), nil));
+            context.code.push(new CodeRet(dummyLine()));
         }
 
         context.pop(this);
@@ -623,8 +624,8 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
-            real.mark().map(n => new LitExp(n.start, 'real', n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
+            real.mark().map(n => new LitExp(n.start, 'real', n.value)),
             bool.mark().map(n => new LitExp(n.start, 'boolean', n.value)),
             strLit.mark().map(n => new LitExp(n.start, 'string', n.value)),
             iden.mark().map(n => new IdenExp(n.start, n.value)),
