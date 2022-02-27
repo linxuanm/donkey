@@ -30,7 +30,7 @@ class CodeJumpIf extends OpCode {
 
     execute(vm, frame) {
         const top = vm.pop();
-        if (top.bool()) frame.pc = this.target;
+        if (top.bool(this.line)) frame.pc = this.target;
     }
 }
 
@@ -130,11 +130,10 @@ class CodeUnOp extends OpCode {
     execute(vm, frame) {
         const val = vm.pop();
 
-        if (this.op in UN_OP) {
-            vm.push(UN_OP[this.op](val));
-        } else {
+        if (!(this.op in UN_OP)) {
             throw sanityError(`Unimplemented Unary Operator '${this.op}'`);
         }
+        vm.push(UN_OP[this.op](val, this.line));
     }
 }
 
@@ -143,6 +142,27 @@ class CodeBinOp extends OpCode {
     constructor(line, op) {
         super(line);
         this.op = op;
+    }
+
+    execute(vm, frame) {
+        const b = vm.pop();
+        const a = vm.pop();
+        const hash = a.type + ' ' + b.type;
+
+        if (!(this.op in BIN_OP)) {
+            throw sanityError(`Unimplemented Binary Operator '${this.op}'`);
+        }
+
+        const operator = BIN_OP[this.op];
+        if (!operator.verify(a.type, b.type)) {
+            throw [
+                `Type Error: Line ${this.line.line}`,
+                `Operator '${this.op}' is undefined for \
+                type '${a.type}' and '${b.type}'`
+            ];
+        }
+
+        vm.push(operator.calc(a, b, this.line));
     }
 }
 

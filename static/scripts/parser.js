@@ -30,7 +30,7 @@ const funcName = alphaNum.assert(
 );
 
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
-const real = P.regexp(/[+-]?([0-9]+[.])?[0-9]+/).map(parseFloat);
+const real = P.regexp(/[+-]?[0-9]+\.[0-9]+/).map(parseFloat);
 const strLit = P.alt(
     P.regexp(/".*?"/),
     P.regexp(/'.*?'/)
@@ -206,6 +206,12 @@ class IfStmt extends Stmt {
         this.irCount = this.cond.irCount + this.ifLen + this.elseLen + 2;
     }
 
+    updateCount() {
+        this.ifLen = stmtLen(this.ifs);
+        this.elseLen = stmtLen(this.elses);
+        this.irCount = this.cond.irCount + this.ifLen + this.elseLen + 2;
+    }
+
     codeGen(context) {
         // TODO: remove jmp if 'else' block is empty
 
@@ -259,7 +265,7 @@ class WhileStmt extends Stmt {
         incre++;
 
         this.repLabel = incre;
-        this.incre += this.stmtLen;
+        incre += this.stmtLen;
 
         this.contLabel = incre;
         incre += this.cond.irCount;
@@ -267,7 +273,10 @@ class WhileStmt extends Stmt {
         this.breakLabel = incre;
 
         context.code.push(new CodeJump(dummyLine(), this.contLabel));
+
+        context.stack.push(this);
         this.stmts.forEach(e => e.codeGen(context));
+        context.stack.pop();
 
         this.cond.codeGen(context);
         context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
@@ -623,8 +632,8 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
-            int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             real.mark().map(n => new LitExp(n.start, 'real', n.value)),
+            int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             bool.mark().map(n => new LitExp(n.start, 'boolean', n.value)),
             strLit.mark().map(n => new LitExp(n.start, 'string', n.value)),
             iden.mark().map(n => new IdenExp(n.start, n.value)),
@@ -767,6 +776,7 @@ const lang = P.createLanguage({
                 return [ifNode, ...elifNodes, ...elseStmt].reduceRight((a, b) => {
                     // to match first 'b' (which is a list of stmts)
                     b.elses = Array.isArray(a) ? a : [a];
+                    b.updateCount();
 
                     return b;
                 });

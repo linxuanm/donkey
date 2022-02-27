@@ -62,6 +62,7 @@ function parseAndRun(code, debugMode=false) {
         try {
             runtime.runMain();
             outputPrint('Program End', '#00CDAF', true);
+            stopCode();
         } catch (error) {
             printError(error);
             stopCode();

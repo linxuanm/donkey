@@ -61,7 +61,12 @@ class DonkeyObject {
 
     assertType(s, msg, line) {
         if (s === 'number') {
-            if (this.type === 'integer' || this.type === 'real') return;
+            if (this.type !== 'integer' && this.type !== 'real') {
+                throw [
+                    `Type Error: Line ${line.line}`,
+                    msg
+                ];
+            }
         }
         if (s !== this.type) throw [
             `Type Error: Line ${line.line}`,
