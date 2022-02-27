@@ -1,49 +1,3 @@
-/*
-    Denotes what's conventionally a heap allocated object but
-    that's basically every value in this runtime implementation
-    cuz weeeeeeeeeeeeeeeeeeeeeeeee.
-*/
-class DonkeyObject {
-
-    constructor(type, value) {
-        this.type = type;
-        this.value = value;
-    }
-
-    /*
-        Primitives (real, boolean, int, string) are passed by value
-        while other ones are passed by reference. This is simulated
-        by just duplicating an instance of a primitive. Primitive
-        types have lower case type names (as lazy as that is).
-
-        Note that when defining a primitive type, make sure its
-        value is passed-by-value in javascript.
-    */
-    copy() {
-        const char = this.type.charAt(0);
-        if (char === char.toUpperCase()) {
-            return this;
-        }
-        return new DonkeyObject(this.type, this.value);
-    }
-
-    assertType(s, msg, line) {
-        if (s !== this.type) throw [
-            `Type Error: Line ${line.line}`,
-            msg
-        ];
-    }
-
-    bool(line) {
-        this.assertType(
-            'boolean',
-            `Type ${this.type} cannot be interpreted as a boolean`,
-            line
-        );
-        return this.value;
-    }
-}
-
 class OpCode {
 
     constructor(line) {
@@ -137,12 +91,32 @@ class CodeInvoke extends OpCode {
     execute(vm, frame) {
         let func;
         if (this.isMethod) {
-
+            throw 'not implemented';
         } else if (this.name in vm.funcs) {
             func = vm.funcs[this.name];
         } else if (this.name in NATIVE_FUNCS) {
             func = NATIVE_FUNCS[this.name];
+        } else {
+            throw [
+                `Name Error: Line ${this.line.line}`,
+                `Function '${this.name}' is not defined`
+            ];
         }
+
+        if (func.params.length !== this.nParams) {
+            throw [
+                `Invocation Error: Line ${this.line.line}`,
+                `Function '${this.name}' called with ${this.nParams} \
+                parameters but expected ${func.params.length}`
+            ];
+        }
+
+        const exps = [];
+        for (var i = 0; i < func.params.length; i++) {
+            exps.push(vm.pop());
+        }
+        exps.reverse();
+        func.invoke(vm, exps);
     }
 }
 
@@ -167,6 +141,10 @@ class CodeRet extends OpCode {
     constructor(line) {
         super(line);
     }
+
+    execute(vm, frame) {
+        vm.funcFrames.pop();
+    }
 }
 
 class CodeConsList extends OpCode {
@@ -183,12 +161,20 @@ class CodeLoadLit extends OpCode {
         super(line);
         this.val = val;
     }
+
+    execute(vm, frame) {
+        vm.push(this.val);
+    }
 }
 
 class CodePop extends OpCode {
 
     constructor(line) {
         super(line);
+    }
+
+    execute(vm, frame) {
+        vm.pop();
     }
 }
 

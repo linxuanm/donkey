@@ -479,8 +479,7 @@ class FuncDecl extends Node {
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
         if (!(context.code[context.code.length - 1] instanceof CodeRet)) {
-            const nil = new DonkeyObject('null', null);
-            context.code.push(new CodeLoadLit(dummyLine(), nil));
+            context.code.push(new CodeLoadLit(dummyLine(), NULL()));
             context.code.push(new CodeRet(dummyLine()));
         }
 

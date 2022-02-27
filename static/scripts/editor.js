@@ -78,7 +78,6 @@ function stopCode() {
 
 function printError(errs, headerFirst=true) {
     // '$' is special simple to differentiate info msgs with expected symbols
-    console.log(errs);
     errs.map((s, i) => showError(s, headerFirst && i === 0));
 }
 
