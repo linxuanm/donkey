@@ -126,6 +126,16 @@ class CodeUnOp extends OpCode {
         super(line);
         this.op = op;
     }
+
+    execute(vm, frame) {
+        const val = vm.pop();
+
+        if (this.op in UN_OP) {
+            vm.push(UN_OP[this.op](val));
+        } else {
+            throw sanityError(`Unimplemented Unary Operator '${this.op}'`);
+        }
+    }
 }
 
 class CodeBinOp extends OpCode {
@@ -152,6 +162,15 @@ class CodeConsList extends OpCode {
     constructor(line, nParams) {
         super(line);
         this.nParams = nParams;
+    }
+
+    execute(vm, frame) {
+        const list = [];
+        for (var i = 0; i < this.nParams; i++) {
+            list.push(vm.pop());
+        }
+        list.reverse();
+        vm.push(LIST(list));
     }
 }
 

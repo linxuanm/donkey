@@ -2,6 +2,26 @@ function NULL() {
     return new DonkeyObject('null', null);
 }
 
+function LIST(arr) {
+    return new DonkeyObject('list', arr);
+}
+
+function STR(str) {
+    return new DonkeyObject('string', str);
+}
+
+function BOOL(b) {
+    return new DonkeyObject('boolean', b);
+}
+
+function INT(x) {
+    return new DonkeyObject('integer', x);
+}
+
+function REAL(x) {
+    return new DonkeyObject('real', x);
+}
+
 // used for testing/debugging only
 function sanityError(msg) {
     return [
@@ -40,6 +60,9 @@ class DonkeyObject {
     }
 
     assertType(s, msg, line) {
+        if (s === 'number') {
+            if (this.type === 'integer' || this.type === 'real') return;
+        }
         if (s !== this.type) throw [
             `Type Error: Line ${line.line}`,
             msg
@@ -53,6 +76,10 @@ class DonkeyObject {
             line
         );
         return this.value;
+    }
+
+    map(func) {
+        return new DonkeyObject(this.type, func(this.value));
     }
 }
 

@@ -61,6 +61,7 @@ function parseAndRun(code, debugMode=false) {
     const runCode = () => {
         try {
             runtime.runMain();
+            outputPrint('Program End', '#00CDAF', true);
         } catch (error) {
             printError(error);
             stopCode();
@@ -78,6 +79,7 @@ function stopCode() {
 
 function printError(errs, headerFirst=true) {
     // '$' is special simple to differentiate info msgs with expected symbols
+    console.log(errs);
     errs.map((s, i) => showError(s, headerFirst && i === 0));
 }
 

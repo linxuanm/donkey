@@ -704,8 +704,16 @@ const lang = P.createLanguage({
             _,
             ['params', r.ListExpCont]
         ).map(e => {
-            // TODO: type conversions
+            if (e.params.length !== 0) {
+                const ref = e.params[0];
+                if (!(ref instanceof LitExp && ref.valType === 'string')) {
+                    e.params[0] = new CallExp(dummyLine, 'str', [ref], false);
+                }
+            }
             const joined = e.params.reduce((a, b) => {
+                if (!(b instanceof LitExp && b.valType === 'string')) {
+                    b = new CallExp(dummyLine, 'str', [b], false);
+                }
                 return new BinExp(e.line.start, '+', a, b);
             });
             const funcExp = new CallExp(e.line.start, '$output', [joined], false);
