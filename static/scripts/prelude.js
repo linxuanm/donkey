@@ -139,11 +139,15 @@ function toString(exp) {
             return exp.value;
         case 'list':
             return `[${exp.value.map(toString).join(', ')}]`;
+        case 'null':
+            return 'null';
         case 'stack':
         case 'queue':
         case 'collection':
             return `${exp.type}[${exp.value.map(toString).join(', ')}]`;
     }
+
+    throw `toString not implemented for type ${exp.type}`;
 }
 
 const NATIVE_FUNCS = {

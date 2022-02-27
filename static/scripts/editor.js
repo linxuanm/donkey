@@ -59,6 +59,7 @@ function parseAndRun(code, debugMode=false) {
     const runtime = loadRuntime(trans);
     // TODO: thread this
     const runCode = () => {
+        //runtime.runMain();
         try {
             runtime.runMain();
             outputPrint('Program End', '#00CDAF', true);

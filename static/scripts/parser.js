@@ -11,7 +11,7 @@ const keywords = [
     'if', 'else', 'then', 'do', 'for', 'while',
     'from', 'to', 'loop', 'input', 'output', 'end',
     'div', 'mod', 'true', 'false', 'return', 'break',
-    'continue', 'not', 'and', 'or'
+    'continue', 'not', 'and', 'or', 'null'
 ];
 
 const _ = P.regexp(/( |\t)*/);
@@ -29,6 +29,7 @@ const funcName = alphaNum.assert(
     `$Identifier name cannot be a keyword`
 );
 
+const nil = P.string('null').map(e => null);
 const int = P.regexp(/-?[0-9]+/).map(parseInt);
 const real = P.regexp(/[+-]?[0-9]+\.[0-9]+/).map(parseFloat);
 const strLit = P.alt(
@@ -632,6 +633,7 @@ const lang = P.createLanguage({
                 parens(r.ListExp, "(", ")"),
                 (name, params) => new CallExp(name.start, name.value, params)
             ),
+            nil.mark().map(n => getNull(n.start)),
             real.mark().map(n => new LitExp(n.start, 'real', n.value)),
             int.mark().map(n => new LitExp(n.start, 'integer', n.value)),
             bool.mark().map(n => new LitExp(n.start, 'boolean', n.value)),
