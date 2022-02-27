@@ -295,12 +295,69 @@ class ForStmt extends Stmt {
         this.from = from;
         this.to = to;
         this.stmts = stmts;
-        this.irCount = from.irCount + to.irCount + stmtLen(stmts) + 5;
+
+        this.stmtLen = stmtLen(stmts);
+        this.irCount = from.irCount + to.irCount + this.stmtLen + 9;
     }
 
     codeGen(context) {
-        throw 'not implemented';
+        let incre = context.code.length;
+        incre += this.from.irCount;
+        incre++;
+        incre += this.to.irCount;
+        incre++;
+
+        this.repLabel = incre;
+        incre += this.stmtLen;
+        this.contLabel = incre;
+        incre += 4; // init integer of 1 and add and assign
+
+        this.initLabel = incre;
+        incre++;
+        incre++;
+
+        this.breakLabel = incre;
+        incre++;
+
+        this.from.codeGen(context);
+        context.code.push(new CodeStoreVar(dummyLine(), this.iter));
+        this.to.codeGen(context);
+        context.code.push(new CodeJump(dummyLine(), this.initLabel));
+
+        context.push(this);
+        this.stmts.forEach(e => e.codeGen(context));
+        context.pop(this);
+
+        context.code.push(new CodeLoadVar(dummyLine(), this.iter));
+        const one = new DonkeyObject('integer', 1);
+        context.code.push(new CodeLoadLit(dummyLine(), one));
+        context.code.push(new CodeBinOp(dummyLine(), '+'));
+        context.code.push(new CodeStoreVar(dummyLine(), this.iter));
+
+        context.code.push(new CodeForTest(dummyLine(), this.iter));
+        context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
+
+        context.code.push(new CodePop(dummyLine()));
     }
+
+    /*
+        <init 'var' to 'from'>
+        <load 'to'>
+        <jump to initLabel>
+        
+        repLabel:
+        [<stmt code>]
+
+        contLabel:
+        <increment 'var'>
+
+        initLabel:
+        <forTest 'var'>
+        <jumpIf to repLabel>
+
+        breakLabel:
+        <pop 'to'>
+    */
 }
 
 class BreakStmt extends Stmt {

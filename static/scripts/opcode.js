@@ -117,3 +117,21 @@ class CodePop extends OpCode {
         super(line);
     }
 }
+
+/*
+    Tests if the given value is less than or equal to the stack
+    top and pushes the result on to the stack. DOES NOT pop the
+    reference element off the stack.
+
+    Actually just a temporary hacky OpCode cuz im not sure if the
+    IB pseudocode for loop should be able to iterate decrementally
+    cuz the IB specification says fuckall on the subject just
+    like every other subject.
+*/
+class CodeForTest extends OpCode {
+
+    constructor(line, name) {
+        super(line);
+        this.name = name;
+    }
+}
