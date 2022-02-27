@@ -18,31 +18,32 @@ class DonkeyRuntime {
     constructor(funcs) {
         this.funcFrames = [];
         this.stack = [];
-        this.funcs = funcs;
         this.mainEnv = {};
+
+        this.funcs = {};
+        for (var i of funcs) {
+            this.funcs[i.name] = {
+                params: i.params,
+                code: i.code
+            };
+        }
     }
 
     runMain(main='$main') {
-        const func = this.getFunc(main);
+        const func = this.funcs[main];
         const frame = new FunctionFrame(func.code);
+        this.funcFrames.push(frame);
 
         while (this.funcFrames.length !== 0) {
-            this.funcFrames[this.funcFrames.length - 1].execute(this);
+            this.curr().execute(this);
         }
     }
 
-    getFunc(name) {
-        if (!(name in this.funcs)) {
-            //TODO: native func loading
-            throw `Function ${name} is undefined`;
-        }
-
-        return this.funcs[name];
+    curr() {
+        return this.funcFrames[this.funcFrames.length - 1];
     }
 }
 
 function loadRuntime(funcs) {
-    const runtime = new DonkeyRuntime(funcs);
-
-
+    return new DonkeyRuntime(funcs);
 }

@@ -46,12 +46,20 @@ function parseAndRun(code, debugMode=false) {
         return;
     }
 
-    try {;
-        const trans = transpile(result.value);
+    let trans;
+    try {
+        trans = transpile(result.value);
     } catch (error) {
         printError(error);
         return;
     }
+
+    const runtime = loadRuntime(trans);
+    // TODO: thread this
+    const runCode = () => {
+        runtime.runMain();
+    };
+    runCode();
 }
 
 function stopCode() {
