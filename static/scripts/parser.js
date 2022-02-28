@@ -445,6 +445,7 @@ class IdenLHS extends LHS {
     constructor(name) {
         super();
         this.name = name;
+        this.irCount = 1;
     }
 
     preGen(context, line) {}

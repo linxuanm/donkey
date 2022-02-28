@@ -114,7 +114,8 @@ function loadCode() {
 
     const content = decodeURIComponent(old);
     area.val(content);
-    updateLineNo(area, content.split('\n').length);
+    editorInfo.lineNo = content.split('\n').length;
+    updateLineNo(area, editorInfo.lineNo);
 }
 
 function toggleClick(btn, panel) {

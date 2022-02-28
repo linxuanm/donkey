@@ -45,6 +45,49 @@ const METHODS = {
 
             lst[idx] = exp[2];
             vm.push(NULL());
+        }),
+        'length': new NativeFunction(['lst'], (vm, exp) => {
+            vm.push(INT(exp[0].value.length));
+        }),
+        'add': new NativeFunction(['lst', 'val'], (vm, exp) => {
+            exp[0].value.push(exp[1]);
+            vm.push(NULL());
+        })
+    },
+    'Queue': {
+        'enqueue': new NativeFunction(['lst', 'val'], (vm, exp) => {
+            exp[0].value.push(exp[1]);
+            vm.push(NULL());
+        }),
+        'dequeue': new NativeFunction(['lst'], (vm, exp, line) => {
+            if (exp[0].value.length === 0) {
+                throw [
+                    `Invalid Operation: Line ${line.line}`,
+                    'Dequeuing from an empty queue'
+                ];
+            }
+            vm.push(exp[0].value.shift());
+        }),
+        'isEmpty': new NativeFunction(['lst'], (vm, exp) => {
+            vm.push(BOOL(exp[0].value.length === 0));
+        })
+    },
+    'Stack': {
+        'push': new NativeFunction(['lst', 'val'], (vm, exp) => {
+            exp[0].value.push(exp[1]);
+            vm.push(NULL());
+        }),
+        'pop': new NativeFunction(['lst'], (vm, exp) => {
+            if (exp[0].value.length === 0) {
+                throw [
+                    `Invalid Operation: Line ${line.line}`,
+                    'Popping from an empty stack'
+                ];
+            }
+            vm.push(exp[0].value.pop());
+        }),
+        'isEmpty': new NativeFunction(['lst'], (vm, exp) => {
+            vm.push(BOOL(exp[0].value.length === 0));
         })
     }
 };
@@ -146,6 +189,11 @@ const BIN_OP = {
 BIN_OP['div'] = BIN_OP['/'];
 BIN_OP['mod'] = BIN_OP['%'];
 
+function repr(exp) {
+    if (exp.type === 'string') return `"${exp.value}"`;
+    return toString(exp)
+}
+
 function toString(exp) {
     switch (exp.type) {
         case 'integer':
@@ -155,13 +203,13 @@ function toString(exp) {
         case 'string':
             return exp.value;
         case 'List':
-            return `[${exp.value.map(toString).join(', ')}]`;
+            return `[${exp.value.map(repr).join(', ')}]`;
         case 'null':
             return 'null';
         case 'Stack':
         case 'Queue':
         case 'Collection':
-            return `${exp.type}[${exp.value.map(toString).join(', ')}]`;
+            return `${exp.type}[${exp.value.map(repr).join(', ')}]`;
     }
 
     throw `toString not implemented for type ${exp.type}`;
