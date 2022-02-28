@@ -61,15 +61,15 @@ function parseAndRun(code, debugMode=false) {
 }
 
 function emitStop() {
-    if (currVM === null) {
+    if (currVM !== null) {
+        clearInterval(currVM);
+        currVM = null;
+
+        showError('Program Aborted', false);
+    } else {
         console.log('Emitting stop signal but there is no active runtime');
-        return;
     }
 
-    clearInterval(currVM);
-    currVM = null;
-
-    showError('Program Aborted', false);
     stopCode();
 }
 
