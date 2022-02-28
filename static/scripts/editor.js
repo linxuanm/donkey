@@ -57,19 +57,20 @@ function parseAndRun(code, debugMode=false) {
     }
 
     const runtime = loadRuntime(trans);
-    // TODO: thread this
-    const runCode = () => {
-        //runtime.runMain();
-        try {
-            runtime.runMain();
-            outputPrint('Program End', '#00CDAF', true);
-            stopCode();
-        } catch (error) {
-            printError(error);
-            stopCode();
-        }
-    };
-    runCode();
+    runtime.runMain();
+}
+
+function emitStop() {
+    if (currVM === null) {
+        console.log('Emitting stop signal but there is no active runtime');
+        return;
+    }
+
+    clearInterval(currVM);
+    currVM = null;
+
+    showError('Program Aborted', false);
+    stopCode();
 }
 
 function stopCode() {
@@ -260,7 +261,7 @@ $(function() {
 
     $('#run-code').click(runCode);
     $('#debug-code').click(debugCode);
-    $('#stop-code').click(stopCode);
+    $('#stop-code').click(emitStop);
 
     toggleClick($('#output-btn'), $('#output-panel'));
     toggleClick($('#debug-btn'), $('#debugger-panel'));

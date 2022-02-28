@@ -1,3 +1,6 @@
+const EXE_FREQ = 20;
+let currVM = null;
+
 function NULL() {
     return new DonkeyObject('null', null);
 }
@@ -163,14 +166,33 @@ class DonkeyRuntime {
     }
 
     runMain(main='$main') {
+        if (currVM !== null) {
+            console.log('Another runtime is running!');
+            return;
+        }
+
         const frame = new FunctionFrame(this.funcs[main].code);
         this.mainEnv = frame.locals;
 
         this.funcFrames.push(frame);
 
-        while (this.funcFrames.length !== 0) {
-            this.currFrame().execute(this);
-        }
+        currVM = setInterval(() => {
+            try {
+                for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
+                    this.currFrame().execute(this);
+                }
+
+                if (this.funcFrames.length === 0) {
+                    clearInterval(currVM);
+                    currVM = null;
+                    outputPrint('Program End', '#00CDAF', true);
+                    stopCode();
+                }
+            } catch (error) {
+                printError(error);
+                stopCode();
+            }
+        }, 1);
     }
 
     currFrame() {
