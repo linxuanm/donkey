@@ -51,9 +51,10 @@ const BIN_OP = {
         calc: (a, b) => {
             if (isNum(a.type, b.type)) {
                 return new DonkeyObject(comb(a, b), a.value + b.value);
+            } else if (a.type === 'List') {
+                return new DonkeyObject('List', a.value.concat(b.value));
             } else {
-                const retType = a.type;
-                return new DonkeyObject(retType, a.value + b.value);
+                return new DonkeyObject('string', a.value + b.value);
             }
         }
     },
