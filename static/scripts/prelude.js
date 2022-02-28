@@ -35,7 +35,7 @@ const METHODS = {
             );
             const lst = exp[0].value;
             const idx = exp[1].value;
-            if (idx >= lst.length) {
+            if (idx >= lst.length || idx < 0) {
                 throw [
                     `Index Error: Line ${line.line}`,
                     `Assigning to index ${idx} of list with \
@@ -176,7 +176,7 @@ const BIN_OP = {
     'index': {
         verify: (a, b) => a === 'List' && b === 'integer',
         calc: (a, b, line) => {
-            if (b.value >= a.value.length) {
+            if (b.value >= a.value.length || b.value < 0) {
                 throw [
                     `Index Error: Line ${line.line}`,
                     `Accessing index ${b.value} of list with length ${a.value.length}`

@@ -70,6 +70,8 @@ class DonkeyObject {
                     msg
                 ];
             }
+
+            return
         }
         if (s !== this.type) throw [
             `Type Error: Line ${line.line}`,
