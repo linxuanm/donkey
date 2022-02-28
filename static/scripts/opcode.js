@@ -93,9 +93,22 @@ class CodeInvoke extends OpCode {
     }
 
     execute(vm, frame) {
+        const exps = [];
+        for (var i = 0; i < this.nParams; i++) {
+            exps.push(vm.pop());
+        }
+        exps.reverse();
+
         let func;
         if (this.isMethod) {
-            throw 'not implemented';
+            const methods = METHODS[exps[0].type] || {};
+            if (!(this.name in methods)) {
+                throw [
+                    `Name Error: Line ${this.line.line}`,
+                    `Type '${exps[0].type}' does not have method '${this.name}'`
+                ];
+            }
+            func = methods[this.name];
         } else if (this.name in vm.funcs) {
             func = vm.funcs[this.name];
         } else if (this.name in NATIVE_FUNCS) {
@@ -115,12 +128,7 @@ class CodeInvoke extends OpCode {
             ];
         }
 
-        const exps = [];
-        for (var i = 0; i < func.params.length; i++) {
-            exps.push(vm.pop());
-        }
-        exps.reverse();
-        func.invoke(vm, exps);
+        func.invoke(vm, exps, this.line);
     }
 }
 

@@ -1,11 +1,3 @@
-const PRELUDE_FUNCS = [
-    'int', 'real', 'str', 'stack', 'queue', 'collection',
-    '$input', '$output'
-];
-
-const PRELUDE_FUNCS_NAME = new Set();
-PRELUDE_FUNCS.forEach(e => PRELUDE_FUNCS_NAME.add(e));
-
 const UN_OP = {
     'not': (b, line) => {
         b.assertType(
@@ -34,7 +26,27 @@ const UN_OP = {
 };
 
 const METHODS = {
-    
+    'List': {
+        '$setIndex': new NativeFunction(['lst', 'idx', 'exp'], (vm, exp, line) => {
+            exp[1].assertType(
+                'integer',
+                `Index must be of type integer, but got '${exp[1].type}'`,
+                line
+            );
+            const lst = exp[0].value;
+            const idx = exp[1].value;
+            if (idx >= lst.length) {
+                throw [
+                    `Index Error: Line ${line.line}`,
+                    `Assigning to index ${idx} of list with \
+                    length ${lst.length}`
+                ];
+            }
+
+            lst[idx] = exp[2];
+            vm.push(NULL());
+        })
+    }
 };
 
 const uniNum = x => x === 'integer' || x === 'real';
@@ -163,11 +175,60 @@ const NATIVE_FUNCS = {
     'str': new NativeFunction(['val'], (vm, exp) => {
         vm.push(STR(toString(exp[0])));
     }),
-    'int': new NativeFunction(['val'], (vm, exp) => {
-        exp[0].assertType('')
-        vm.push(INT());
+    'int': new NativeFunction(['val'], (vm, exp, line) => {
+        if (exp[0].type === 'integer') {
+            vm.push(exp[0]);
+        } else if (exp[0].type === 'real') {
+            vm.push(exp[0].map(floor));
+        } else if (exp[0].type === 'string') {
+            const val = parseInt(exp[0].value);
+            if (isNaN(val)) {
+                throw [
+                    `Value Error: Line ${line.line}`,
+                    `string '${exp[0].value}' cannot be converted to an integer`
+                ];
+            }
+
+            vm.push(INT(val));
+        } else {
+            throw [
+                `Type Error: Line ${line.line}`,
+                `'int()' cannot be used on type ${exp[0].type}`
+            ];
+        }
     }),
-    'real': new NativeFunction(['val'], (vm, exp) => {
-        vm.push(INT(toString(exp[0])));
+    'real': new NativeFunction(['val'], (vm, exp, line) => {
+        if (exp[0].type === 'real') {
+            vm.push(exp[0]);
+        } else if (exp[0].type === 'integer') {
+            vm.push(REAL(exp[0].value));
+        } else if (exp[0].type === 'string') {
+            const val = parseFloat(exp[0].value);
+            if (isNaN(val)) {
+                throw [
+                    `Value Error: Line ${line.line}`,
+                    `string '${exp[0].value}' cannot be converted to a real`
+                ];
+            }
+
+            vm.push(INT(val));
+        } else {
+            throw [
+                `Type Error: Line ${line.line}`,
+                `'real()' cannot be used on type ${exp[0].type}`
+            ];
+        }
+    }),
+    'stack': new NativeFunction([], (vm, exp, line) => {
+        vm.push(new DonkeyObject('Stack', []));
+    }),
+    'queue': new NativeFunction([], (vm, exp, line) => {
+        vm.push(new DonkeyObject('Queue', []));
+    }),
+    'collection': new NativeFunction([], (vm, exp, line) => {
+        vm.push(new DonkeyObject('Collection', []));
     })
 };
+
+const PRELUDE_FUNCS_NAME = new Set();
+Object.keys(NATIVE_FUNCS).forEach(e => PRELUDE_FUNCS_NAME.add(e));

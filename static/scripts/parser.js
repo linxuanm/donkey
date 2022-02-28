@@ -65,11 +65,11 @@ class Stmt extends Node {
 
 class LHS {
 
-    preGen(context) {
+    preGen(context, line) {
         throw 'not implemented';
     }
 
-    postGen(context) {
+    postGen(context, line) {
         throw 'not implemented';
     }
 }
@@ -188,9 +188,9 @@ class AsnStmt extends Stmt {
     }
 
     codeGen(context) {
-        this.lhs.preGen(context);
+        this.lhs.preGen(context, this.line);
         this.exp.codeGen(context);
-        this.lhs.postGen(context);
+        this.lhs.postGen(context, this.line);
     }
 }
 
@@ -445,12 +445,11 @@ class IdenLHS extends LHS {
     constructor(name) {
         super();
         this.name = name;
-        this.irCount = 1;
     }
 
-    preGen(context) {}
+    preGen(context, line) {}
 
-    postGen(context) {
+    postGen(context, line) {
         context.code.push(new CodeStoreVar(dummyLine(), this.name));
     }
 }
@@ -464,13 +463,13 @@ class IdxLHS extends LHS {
         this.irCount = exp.irCount + idx.irCount + 2;
     }
 
-    preGen(context) {
+    preGen(context, line) {
         this.exp.codeGen(context);
         this.idx.codeGen(context);
     }
 
-    postGen(context) {
-        context.code.push(new CodeInvoke(dummyLine(), '$setIndex', 3, true));
+    postGen(context, line) {
+        context.code.push(new CodeInvoke(line, '$setIndex', 3, true));
         context.code.push(new CodePop(dummyLine()));
     }
 }

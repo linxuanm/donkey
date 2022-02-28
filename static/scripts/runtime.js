@@ -132,8 +132,8 @@ class NativeFunction extends AbstractFunction {
         this.wrapped = wrapped;
     }
 
-    invoke(vm, exps) {
-        this.wrapped(vm, exps);
+    invoke(vm, exps, line) {
+        this.wrapped(vm, exps, line);
     }
 }
 
@@ -189,6 +189,8 @@ class DonkeyRuntime {
                     stopCode();
                 }
             } catch (error) {
+                clearInterval(currVM);
+                currVM = null;
                 printError(error);
                 stopCode();
             }
