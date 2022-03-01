@@ -275,6 +275,12 @@ const NATIVE_FUNCS = {
     }),
     'collection': new NativeFunction([], (vm, exp, line) => {
         vm.push(new DonkeyObject('Collection', []));
+    }),
+    '$input': new NativeFunction([], (vm, exp) => {
+        const res = prompt('Input: ');
+        const msg = `<strong>Input:</strong> <i>'${res}'</i>`;
+        outputPrint(msg, '#8ADDFF', false, true);
+        vm.push(STR(res));
     })
 };
 

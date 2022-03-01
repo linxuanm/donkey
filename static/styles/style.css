@@ -11,6 +11,10 @@
     user-select: none;
 }
 
+* {
+    margin: 0;
+}
+
 html, body {
     margin: 0;
     height: 100vh;
@@ -21,15 +25,21 @@ textarea {
     border: 0;
 }
 
+#code {
+    z-index: 0;
+    color: transparent;
+    background: transparent;
+    caret-color: #D4D4D4;
+}
+
+#highlight-box {
+    z-index: -1;
+    overflow: hidden;
+}
+
 #title-bar {
     width: 100%;
     flex: 0 0 50px;
-}
-
-#code {
-    outline: none;
-    padding: 10px;
-    line-height: 30px;
 }
 
 #line-container-outer {
@@ -51,6 +61,24 @@ textarea {
 #action-bar {
     flex: 0 0 65px;
     border-right: 2px solid #404040;
+}
+
+.code-outer {
+    position: relative;
+}
+
+.fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.code-entry {
+    outline: none;
+    padding: 10px;
+    line-height: 30px;
 }
 
 .select {

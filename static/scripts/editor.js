@@ -1,4 +1,5 @@
 const COOKIE_NAME = 'code';
+const hack = '\n'.repeat(30) + ' ';
 
 const config = {
     tabSize: 4
@@ -116,6 +117,8 @@ function loadCode() {
     area.val(content);
     editorInfo.lineNo = content.split('\n').length;
     updateLineNo($('#line-container'), editorInfo.lineNo);
+
+    $('#highlight-code').text(content + hack);
 }
 
 function toggleClick(btn, panel) {
@@ -136,16 +139,17 @@ function toggleClick(btn, panel) {
     })
 }
 
-function outputPrint(text, color='#D4D4D4', bold=false) {
-    $('#output-panel').append($('<div>', {
+function outputPrint(text, color='#D4D4D4', bold=false, raw=false) {
+    const vals = {
         class: 'output-base',
-        text: text,
-        style: `color: ${color};font-weight:${bold ? 'bold' : 'normal'};`,
-    }));
+        style: `color: ${color};\
+                font-weight:${bold ? 'bold' : 'normal'};`,
+    };
+    vals[raw ? 'html' : 'text'] = text;
+    $('#output-panel').append($('<div>', vals));
 }
 
 function updateLineNo(container, num) {
-    // TODO: fix potential race condition
     const children = container.children();
     const diff = num - container.children().length;
 
@@ -179,6 +183,8 @@ $(function() {
     updateLineNo(container, editorInfo.lineNo);
 
     codeArea.on('input', function() {
+        // hacky way to extend length of the code ik
+        $('#highlight-code').text(codeArea.val() + hack);
         const codeLength = codeArea.val().split(/\r|\r\n|\n/).length;
 
         if (editorInfo.lineNo !== codeLength) {
@@ -188,7 +194,11 @@ $(function() {
     });
 
     codeArea.on('scroll', function() {
-        container.scrollTop(codeArea.scrollTop());
+        const top = codeArea.scrollTop();
+        const left = codeArea.scrollLeft();
+        container.scrollTop(top);
+        $('#highlight-box').scrollTop(top);
+        $('#highlight-box').scrollLeft(left);
     });
 
     codeArea.keydown(function(e) {
