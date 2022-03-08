@@ -1,5 +1,4 @@
 const COOKIE_NAME = 'code';
-const hack = '\n'.repeat(30) + ' ';
 
 const config = {
     tabSize: 4
@@ -90,7 +89,7 @@ function printError(errs, headerFirst=true) {
 function showError(text, header=true, color='#FF3843') {
     if (header) {
         outputPrint(
-            'Your program failed, just like your life',
+            'Your program failed, you donkey',
             color,
             true
         );
@@ -117,8 +116,6 @@ function loadCode() {
     area.val(content);
     editorInfo.lineNo = content.split('\n').length;
     updateLineNo($('#line-container'), editorInfo.lineNo);
-
-    $('#highlight-code').text(content + hack);
 }
 
 function toggleClick(btn, panel) {
@@ -183,8 +180,6 @@ $(function() {
     updateLineNo(container, editorInfo.lineNo);
 
     codeArea.on('input', function() {
-        // hacky way to extend length of the code ik
-        $('#highlight-code').text(codeArea.val() + hack);
         const codeLength = codeArea.val().split(/\r|\r\n|\n/).length;
 
         if (editorInfo.lineNo !== codeLength) {
@@ -194,11 +189,7 @@ $(function() {
     });
 
     codeArea.on('scroll', function() {
-        const top = codeArea.scrollTop();
-        const left = codeArea.scrollLeft();
-        container.scrollTop(top);
-        $('#highlight-box').scrollTop(top);
-        $('#highlight-box').scrollLeft(left);
+        container.scrollTop(codeArea.scrollTop());
     });
 
     codeArea.keydown(function(e) {
