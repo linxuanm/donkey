@@ -270,7 +270,7 @@ const NATIVE_FUNCS = {
         if (exp[0].type === 'integer') {
             vm.push(exp[0]);
         } else if (exp[0].type === 'real') {
-            vm.push(exp[0].map(Math.floor));
+            vm.push(INT(Math.floor(exp[0].value)));
         } else if (exp[0].type === 'string') {
             const val = parseInt(exp[0].value);
             if (isNaN(val)) {
