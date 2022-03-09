@@ -1,3 +1,11 @@
+class CollectionInner {
+
+    constructor() {
+        this.data = [];
+        this.iter = 0;
+    }
+}
+
 const UN_OP = {
     'not': (b, line) => {
         b.assertType(
@@ -77,7 +85,7 @@ const METHODS = {
             exp[0].value.push(exp[1]);
             vm.push(NULL());
         }),
-        'pop': new NativeFunction(['lst'], (vm, exp) => {
+        'pop': new NativeFunction(['lst'], (vm, exp, line) => {
             if (exp[0].value.length === 0) {
                 throw [
                     `Invalid Operation: Line ${line.line}`,
@@ -88,6 +96,39 @@ const METHODS = {
         }),
         'isEmpty': new NativeFunction(['lst'], (vm, exp) => {
             vm.push(BOOL(exp[0].value.length === 0));
+        })
+    },
+    'Collection': {
+        'addItem': new NativeFunction(['col', 'val'], (vm, exp) => {
+            exp[0].value.data.push(exp[1]);
+            vm.push(NULL());
+        }),
+        'addAll': new NativeFunction(['col', 'val'], (vm, exp, line) => {
+            exp[1].assertType(
+                'List', 'Collection.addAll only adds lists', line
+            );
+            exp[0].value.data = exp[0].value.data.concat(exp[1].value);
+            vm.push(NULL());
+        }),
+        'hasNext': new NativeFunction(['col'], (vm, exp) => {
+            vm.push(BOOL(exp[0].value.iter < exp[0].value.data.length));
+        }),
+        'isEmpty': new NativeFunction(['col'], (vm, exp) => {
+            vm.push(BOOL(exp[0].value.data.length === 0));
+        }),
+        'resetNext': new NativeFunction(['col'], (vm, exp) => {
+            exp[0].value.iter = 0;
+            vm.push(NULL());
+        }),
+        'getNext': new NativeFunction(['col'], (vm, exp, line) => {
+            const col = exp[0].value;
+            if (col.iter >= col.data.length) {
+                throw [
+                    `Invalid Operation: Line ${line.line}`,
+                    'Collection reached end of iteration'
+                ];
+            }
+            vm.push(col.data[col.iter++]);
         })
     }
 };
@@ -208,8 +249,10 @@ function toString(exp) {
             return 'null';
         case 'Stack':
         case 'Queue':
-        case 'Collection':
             return `${exp.type}[${exp.value.map(repr).join(', ')}]`;
+        case 'Collection':
+            const suf = `[${exp.value.data.map(repr).join(', ')}]`;
+            return `Collection(ptr=${exp.value.iter})` + suf;
     }
 
     throw `toString not implemented for type ${exp.type}`;
@@ -274,7 +317,7 @@ const NATIVE_FUNCS = {
         vm.push(new DonkeyObject('Queue', []));
     }),
     'collection': new NativeFunction([], (vm, exp, line) => {
-        vm.push(new DonkeyObject('Collection', []));
+        vm.push(new DonkeyObject('Collection', new CollectionInner()));
     }),
     '$input': new NativeFunction([], (vm, exp) => {
         const res = prompt('Input: ');
