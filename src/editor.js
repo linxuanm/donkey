@@ -3,7 +3,7 @@ import Cookies from 'js.cookie';
 
 import { lang } from './parser';
 import { transpile } from './transpiler';
-import { loadRuntime } from './runtime'
+import * as Runtime from './runtime'
 
 const COOKIE_NAME = 'code';
 const config = {
@@ -62,14 +62,14 @@ function parseAndRun(code, debugMode=false) {
         return;
     }
 
-    const runtime = loadRuntime(trans);
+    const runtime = Runtime.loadRuntime(trans);
     runtime.runMain();
 }
 
 function emitStop() {
-    if (currVM !== null) {
-        clearInterval(currVM);
-        currVM = null;
+    if (Runtime.currVM !== null) {
+        clearInterval(Runtime.currVM);
+        Runtime.currVM = null;
 
         showError('Program Aborted', false);
     } else {

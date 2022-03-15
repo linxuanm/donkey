@@ -201,3 +201,18 @@ export class DonkeyRuntime {
 export function loadRuntime(funcs) {
     return new DonkeyRuntime(funcs);
 }
+
+export class VMError {
+
+    constructor(type, msg) {
+        this.type = type;
+        this.msg = msg;
+    }
+
+    formatMsg(vm) {
+        return [
+            `${this.type}: Line ${vm.currFrame().pc}`,
+            this.msg
+        ];
+    }
+}
