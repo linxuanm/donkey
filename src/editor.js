@@ -67,9 +67,9 @@ function parseAndRun(code, debugMode=false) {
 }
 
 function emitStop() {
-    if (Runtime.currVM !== null) {
-        clearInterval(Runtime.currVM);
-        Runtime.currVM = null;
+    if (global.currVM !== null) {
+        clearInterval(global.currVM);
+        global.currVM = null;
 
         showError('Program Aborted', false);
     } else {

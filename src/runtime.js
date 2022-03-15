@@ -1,7 +1,7 @@
 import * as Editor from './editor';
 
 const EXE_FREQ = 50;
-export let currVM = null;
+global.currVM = null;
 
 export const [NULL, LIST, STR, BOOL, INT, REAL] = [
     'null', 'List', 'string', 'boolean', 'integer', 'real'
@@ -150,7 +150,7 @@ export class DonkeyRuntime {
     }
 
     runMain(main='$main') {
-        if (currVM !== null) {
+        if (global.currVM !== null) {
             console.log('Another runtime is running!');
             return;
         }
@@ -160,21 +160,21 @@ export class DonkeyRuntime {
 
         this.funcFrames.push(frame);
 
-        currVM = setInterval(() => {
+        global.currVM = setInterval(() => {
             try {
                 for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
                     this.currFrame().execute(this);
                 }
 
                 if (this.funcFrames.length === 0) {
-                    clearInterval(currVM);
-                    currVM = null;
+                    clearInterval(global.currVM);
+                    global.currVM = null;
                     Editor.outputPrint('Program End', '#00CDAF', true);
                     Editor.stopCode();
                 }
             } catch (error) {
-                clearInterval(currVM);
-                currVM = null;
+                clearInterval(global.currVM);
+                global.currVM = null;
                 Editor.printError(error);
                 Editor.stopCode();
             }
