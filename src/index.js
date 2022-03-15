@@ -1,1 +1,1 @@
-import editor from './editor';
+import * as Editor from './editor';

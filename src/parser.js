@@ -1,4 +1,7 @@
-import P from "parsimmon";
+import P from 'parsimmon';
+
+import * as Runtime from './runtime';
+import * as Code from './opcode';
 
 const ops = [
     ['*', 'div', 'mod', '/', '%'],
@@ -84,8 +87,8 @@ export class LitExp extends Exp {
     }
 
     codeGen(context) {
-        const obj = new DonkeyObject(this.valType, this.val);
-        context.code.push(new CodeLoadLit(this.line, obj));
+        const obj = new Runtime.DonkeyObject(this.valType, this.val);
+        context.code.push(new Code.CodeLoadLit(this.line, obj));
     }
 }
 
@@ -99,7 +102,7 @@ export class ListExp extends Exp {
 
     codeGen(context) {
         this.val.forEach(e => e.codeGen(context));
-        context.code.push(new CodeConsList(this.line, this.val.length));
+        context.code.push(new Code.CodeConsList(this.line, this.val.length));
     }
 }
 
@@ -112,7 +115,7 @@ export class IdenExp extends Exp {
     }
 
     codeGen(context) {
-        context.code.push(new CodeLoadVar(this.line, this.name));
+        context.code.push(new Code.CodeLoadVar(this.line, this.name));
     }    
 }
 
@@ -130,7 +133,7 @@ export class BinExp extends Exp {
         this.a.codeGen(context);
         this.b.codeGen(context);
 
-        context.code.push(new CodeBinOp(this.line, this.op));
+        context.code.push(new Code.CodeBinOp(this.line, this.op));
     }  
 }
 
@@ -146,7 +149,7 @@ export class UniExp extends Exp {
     codeGen(context) {
         this.val.codeGen(context);
 
-        context.code.push(new CodeUnOp(this.line, this.op));
+        context.code.push(new Code.CodeUnOp(this.line, this.op));
     }
 }
 
@@ -170,7 +173,7 @@ export class CallExp extends Exp {
         this.params.forEach(e => e.codeGen(context));
 
         context.code.push(
-            new CodeInvoke(
+            new Code.CodeInvoke(
                 this.line, this.name,
                 this.params.length, this.isMethod
             )
@@ -226,11 +229,11 @@ export class IfStmt extends Stmt {
         this.endLabel = incre;
 
         this.cond.codeGen(context);
-        context.code.push(new CodeJumpIf(dummyLine(), this.ifLabel));
+        context.code.push(new Code.CodeJumpIf(dummyLine(), this.ifLabel));
         context.push(this);
 
         this.elses.forEach(e => e.codeGen(context));
-        context.code.push(new CodeJump(dummyLine(), this.endLabel));
+        context.code.push(new Code.CodeJump(dummyLine(), this.endLabel));
 
         this.ifs.forEach(e => e.codeGen(context));
 
@@ -273,14 +276,14 @@ export class WhileStmt extends Stmt {
         incre++;
         this.breakLabel = incre;
 
-        context.code.push(new CodeJump(dummyLine(), this.contLabel));
+        context.code.push(new Code.CodeJump(dummyLine(), this.contLabel));
 
         context.stack.push(this);
         this.stmts.forEach(e => e.codeGen(context));
         context.stack.pop();
 
         this.cond.codeGen(context);
-        context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
+        context.code.push(new Code.CodeJumpIf(dummyLine(), this.repLabel));
     }
 
     /*
@@ -330,24 +333,24 @@ export class ForStmt extends Stmt {
         incre++;
 
         this.from.codeGen(context);
-        context.code.push(new CodeStoreVar(dummyLine(), this.iter));
+        context.code.push(new Code.CodeStoreVar(dummyLine(), this.iter));
         this.to.codeGen(context);
-        context.code.push(new CodeJump(dummyLine(), this.initLabel));
+        context.code.push(new Code.CodeJump(dummyLine(), this.initLabel));
 
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
         context.pop(this);
 
-        context.code.push(new CodeLoadVar(this.line, this.iter));
-        const one = new DonkeyObject('integer', 1);
-        context.code.push(new CodeLoadLit(dummyLine(), one));
-        context.code.push(new CodeBinOp(dummyLine(), '+'));
-        context.code.push(new CodeStoreVar(dummyLine(), this.iter));
+        context.code.push(new Code.CodeLoadVar(this.line, this.iter));
+        const one = new Runtime.DonkeyObject('integer', 1);
+        context.code.push(new Code.CodeLoadLit(dummyLine(), one));
+        context.code.push(new Code.CodeBinOp(dummyLine(), '+'));
+        context.code.push(new Code.CodeStoreVar(dummyLine(), this.iter));
 
-        context.code.push(new CodeForTest(this.line, this.iter));
-        context.code.push(new CodeJumpIf(dummyLine(), this.repLabel));
+        context.code.push(new Code.CodeForTest(this.line, this.iter));
+        context.code.push(new Code.CodeJumpIf(dummyLine(), this.repLabel));
 
-        context.code.push(new CodePop(dummyLine()));
+        context.code.push(new Code.CodePop(dummyLine()));
     }
 
     /*
@@ -384,7 +387,7 @@ export class BreakStmt extends Stmt {
             'Break statement outside of loop'
         ];
 
-        context.code.push(new CodeJump(this.line, loop.breakLabel));
+        context.code.push(new Code.CodeJump(this.line, loop.breakLabel));
     }
 }
 
@@ -402,7 +405,7 @@ export class ContStmt extends Stmt {
             'Continue statement outside of loop'
         ];
 
-        context.code.push(new CodeJump(this.line, loop.contLabel));
+        context.code.push(new Code.CodeJump(this.line, loop.contLabel));
     }
 }
 
@@ -422,7 +425,7 @@ export class RetStmt extends Stmt {
         ];
 
         this.exp.codeGen(context);
-        context.code.push(new CodeRet(this.line));
+        context.code.push(new Code.CodeRet(this.line));
     }
 }
 
@@ -436,7 +439,7 @@ export class FuncCallStmt extends Stmt {
 
     codeGen(context) {
         this.funcExp.codeGen(context);
-        context.code.push(new CodePop(dummyLine()));
+        context.code.push(new Code.CodePop(dummyLine()));
     }
 }
 
@@ -451,7 +454,7 @@ export class IdenLHS extends LHS {
     preGen(context, line) {}
 
     postGen(context, line) {
-        context.code.push(new CodeStoreVar(dummyLine(), this.name));
+        context.code.push(new Code.CodeStoreVar(dummyLine(), this.name));
     }
 }
 
@@ -470,8 +473,8 @@ export class IdxLHS extends LHS {
     }
 
     postGen(context, line) {
-        context.code.push(new CodeInvoke(line, '$setIndex', 3, true));
-        context.code.push(new CodePop(dummyLine()));
+        context.code.push(new Code.CodeInvoke(line, '$setIndex', 3, true));
+        context.code.push(new Code.CodePop(dummyLine()));
     }
 }
 
@@ -488,9 +491,9 @@ export class FuncDecl extends Node {
     codeGen(context) {
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
-        if (!(context.code[context.code.length - 1] instanceof CodeRet)) {
-            context.code.push(new CodeLoadLit(dummyLine(), NULL()));
-            context.code.push(new CodeRet(dummyLine()));
+        if (!(context.code[context.code.length - 1] instanceof Code.CodeRet)) {
+            context.code.push(new Code.CodeLoadLit(dummyLine(), Runtime.NULL()));
+            context.code.push(new Code.CodeRet(dummyLine()));
         }
 
         context.pop(this);

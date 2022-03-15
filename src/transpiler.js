@@ -1,4 +1,5 @@
 import { Stmt, FuncDecl, dummyLine } from './parser';
+import * as Prelude from './prelude';
 
 class CodeGenContext {
 
@@ -26,7 +27,7 @@ export function transpile(code) {
             mainStmts.push(i);
         } else if (i instanceof FuncDecl) {
             const name = i.name;
-            if (PRELUDE_FUNCS_NAME.has(name)) {
+            if (Prelude.PRELUDE_FUNCS_NAME.has(name)) {
                 throw [
                     `Structure Error: Line ${i.line.line}`,
                     `Function name conflicts with native function: ${name}`

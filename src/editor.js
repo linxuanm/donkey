@@ -3,6 +3,7 @@ import Cookies from 'js.cookie';
 
 import { lang } from './parser';
 import { transpile } from './transpiler';
+import { loadRuntime } from './runtime'
 
 const COOKIE_NAME = 'code';
 const config = {
@@ -78,14 +79,14 @@ function emitStop() {
     stopCode();
 }
 
-function stopCode() {
+export function stopCode() {
     updateStatusText('Editing');
     $('.run-action').hide();
     $('.debug-action').hide()
     $('.main-action').show();
 }
 
-function printError(errs, headerFirst=true) {
+export function printError(errs, headerFirst=true) {
     // '$' is special simple to differentiate info msgs with expected symbols
     console.log(errs);
     errs.map((s, i) => showError(s, headerFirst && i === 0));
@@ -141,7 +142,7 @@ function toggleClick(btn, panel) {
     })
 }
 
-function outputPrint(text, color='#D4D4D4', bold=false, raw=false) {
+export function outputPrint(text, color='#D4D4D4', bold=false, raw=false) {
     const vals = {
         class: 'output-base',
         style: `color:${color};\

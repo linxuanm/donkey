@@ -1,31 +1,11 @@
-const { __esModule } = require("js.cookie");
+import * as Editor from './editor';
 
-const EXE_FREQ = 20;
-let currVM = null;
+const EXE_FREQ = 50;
+export let currVM = null;
 
-function NULL() {
-    return new DonkeyObject('null', null);
-}
-
-function LIST(arr) {
-    return new DonkeyObject('List', arr);
-}
-
-function STR(str) {
-    return new DonkeyObject('string', str);
-}
-
-function BOOL(b) {
-    return new DonkeyObject('boolean', b);
-}
-
-function INT(x) {
-    return new DonkeyObject('integer', x);
-}
-
-function REAL(x) {
-    return new DonkeyObject('real', x);
-}
+export const [NULL, LIST, STR, BOOL, INT, REAL] = [
+    'null', 'List', 'string', 'boolean', 'integer', 'real'
+].map(e => (val = null) => new DonkeyObject(e, val));
 
 // used for testing/debugging only
 function sanityError(msg) {
@@ -40,7 +20,7 @@ function sanityError(msg) {
     that's basically every value in this runtime implementation
     cuz weeeeeeeeeeeeeeeeeeeeeeeee.
 */
-class DonkeyObject {
+export class DonkeyObject {
 
     constructor(type, value) {
         this.type = type;
@@ -129,7 +109,7 @@ class CodeFunction extends AbstractFunction {
     }
 }
 
-class NativeFunction extends AbstractFunction {
+export class NativeFunction extends AbstractFunction {
 
     constructor(params, wrapped) {
         super(params);
@@ -156,7 +136,7 @@ class FunctionFrame {
     }
 }
 
-class DonkeyRuntime {
+export class DonkeyRuntime {
 
     constructor(funcs) {
         this.funcFrames = [];
@@ -189,14 +169,14 @@ class DonkeyRuntime {
                 if (this.funcFrames.length === 0) {
                     clearInterval(currVM);
                     currVM = null;
-                    outputPrint('Program End', '#00CDAF', true);
-                    stopCode();
+                    Editor.outputPrint('Program End', '#00CDAF', true);
+                    Editor.stopCode();
                 }
             } catch (error) {
                 clearInterval(currVM);
                 currVM = null;
-                printError(error);
-                stopCode();
+                Editor.printError(error);
+                Editor.stopCode();
             }
         }, 1);
     }
@@ -218,17 +198,6 @@ class DonkeyRuntime {
     }
 }
 
-function loadRuntime(funcs) {
+export function loadRuntime(funcs) {
     return new DonkeyRuntime(funcs);
 }
-
-module.exports = {
-    NULL,
-    STR,
-    INT,
-    REAL,
-    BOOL,
-    LIST,
-    DonkeyObject,
-    NativeFunction
-};

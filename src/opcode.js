@@ -1,3 +1,6 @@
+import * as Prelude from './prelude';
+import * as Runtime from './runtime';
+
 function loadVar(name, vm, frame, line) {
     if (name in frame.locals) {
         return frame.locals[name];
@@ -11,7 +14,7 @@ function loadVar(name, vm, frame, line) {
     }
 }
 
-class OpCode {
+export class OpCode {
 
     constructor(line) {
         this.line = line;
@@ -22,7 +25,7 @@ class OpCode {
     }
 }
 
-class CodeJump extends OpCode {
+export class CodeJump extends OpCode {
 
     constructor(line, target) {
         super(line);
@@ -34,7 +37,7 @@ class CodeJump extends OpCode {
     }
 }
 
-class CodeJumpIf extends OpCode {
+export class CodeJumpIf extends OpCode {
 
     constructor(line, target) {
         super(line);
@@ -47,7 +50,7 @@ class CodeJumpIf extends OpCode {
     }
 }
 
-class CodeLoadVar extends OpCode {
+export class CodeLoadVar extends OpCode {
 
     constructor(line, name) {
         super(line);
@@ -67,7 +70,7 @@ class CodeLoadVar extends OpCode {
     Yea ik weird design but IB also didn't specify the scoping/referencing
     rules for global variables so imma improvise.
 */
-class CodeStoreVar extends OpCode {
+export class CodeStoreVar extends OpCode {
 
     constructor(line, name) {
         super(line);
@@ -83,7 +86,7 @@ class CodeStoreVar extends OpCode {
     }
 }
 
-class CodeInvoke extends OpCode {
+export class CodeInvoke extends OpCode {
 
     constructor(line, name, nParams, isMethod=false) {
         super(line);
@@ -101,7 +104,7 @@ class CodeInvoke extends OpCode {
 
         let func;
         if (this.isMethod) {
-            const methods = METHODS[exps[0].type] || {};
+            const methods = Prelude.METHODS[exps[0].type] || {};
             if (!(this.name in methods)) {
                 throw [
                     `Name Error: Line ${this.line.line}`,
@@ -111,8 +114,8 @@ class CodeInvoke extends OpCode {
             func = methods[this.name];
         } else if (this.name in vm.funcs) {
             func = vm.funcs[this.name];
-        } else if (this.name in NATIVE_FUNCS) {
-            func = NATIVE_FUNCS[this.name];
+        } else if (this.name in Prelude.NATIVE_FUNCS) {
+            func = Prelude.NATIVE_FUNCS[this.name];
         } else {
             throw [
                 `Name Error: Line ${this.line.line}`,
@@ -132,7 +135,7 @@ class CodeInvoke extends OpCode {
     }
 }
 
-class CodeUnOp extends OpCode {
+export class CodeUnOp extends OpCode {
 
     constructor(line, op) {
         super(line);
@@ -142,14 +145,14 @@ class CodeUnOp extends OpCode {
     execute(vm, frame) {
         const val = vm.pop();
 
-        if (!(this.op in UN_OP)) {
+        if (!(this.op in Prelude.UN_OP)) {
             throw sanityError(`Unimplemented Unary Operator '${this.op}'`);
         }
-        vm.push(UN_OP[this.op](val, this.line));
+        vm.push(Prelude.UN_OP[this.op](val, this.line));
     }
 }
 
-class CodeBinOp extends OpCode {
+export class CodeBinOp extends OpCode {
 
     constructor(line, op) {
         super(line);
@@ -161,11 +164,11 @@ class CodeBinOp extends OpCode {
         const a = vm.pop();
         const hash = a.type + ' ' + b.type;
 
-        if (!(this.op in BIN_OP)) {
+        if (!(this.op in Prelude.BIN_OP)) {
             throw sanityError(`Unimplemented Binary Operator '${this.op}'`);
         }
 
-        const operator = BIN_OP[this.op];
+        const operator = Prelude.BIN_OP[this.op];
         if (!operator.verify(a.type, b.type)) {
             throw [
                 `Type Error: Line ${this.line.line}`,
@@ -178,7 +181,7 @@ class CodeBinOp extends OpCode {
     }
 }
 
-class CodeRet extends OpCode {
+export class CodeRet extends OpCode {
 
     constructor(line) {
         super(line);
@@ -189,7 +192,7 @@ class CodeRet extends OpCode {
     }
 }
 
-class CodeConsList extends OpCode {
+export class CodeConsList extends OpCode {
     
     constructor(line, nParams) {
         super(line);
@@ -202,11 +205,11 @@ class CodeConsList extends OpCode {
             list.push(vm.pop());
         }
         list.reverse();
-        vm.push(LIST(list));
+        vm.push(Runtime.LIST(list));
     }
 }
 
-class CodeLoadLit extends OpCode {
+export class CodeLoadLit extends OpCode {
 
     constructor(line, val) {
         super(line);
@@ -218,7 +221,7 @@ class CodeLoadLit extends OpCode {
     }
 }
 
-class CodePop extends OpCode {
+export class CodePop extends OpCode {
 
     constructor(line) {
         super(line);
@@ -239,7 +242,7 @@ class CodePop extends OpCode {
     cuz the IB specification says fuckall on the subject just
     like every other subject.
 */
-class CodeForTest extends OpCode {
+export class CodeForTest extends OpCode {
 
     constructor(line, name) {
         super(line);
@@ -251,13 +254,13 @@ class CodeForTest extends OpCode {
         vm.push(top);
 
         const ref = loadVar(this.name, vm, frame, this.line);
-        if (!BIN_OP['<='].verify(ref.type, top.type)) {
+        if (!Prelude.BIN_OP['<='].verify(ref.type, top.type)) {
             throw [
                 `Type Error: Line ${this.line.line}`,
                 `For loop requires numeric bounds, but has acculator \
                 of type ${ref.type} and target value of type ${top.type}`
             ];
         }
-        vm.push(BIN_OP['<='].calc(ref, top));
+        vm.push(Prelude.BIN_OP['<='].calc(ref, top));
     }
 }
