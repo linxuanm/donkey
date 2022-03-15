@@ -828,7 +828,9 @@ export const lang = P.createLanguage({
         ).map(e => new ForStmt(e.line.start, e.iter, e.from, e.to, e.stmts));
     },
     Global: r => {
-        return P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace);
+        return P.optWhitespace.then(
+            P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace)
+        );
     },
     LineDiv: r => {
         return _.then(P.newline).skip(P.optWhitespace);
