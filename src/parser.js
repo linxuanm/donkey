@@ -1,5 +1,4 @@
-const { __esModule } = require('js.cookie');
-const P = require('parsimmon');;
+import P from "parsimmon";
 
 const ops = [
     ['*', 'div', 'mod', '/', '%'],
@@ -44,7 +43,7 @@ const bool = P.regexp(/true|false/).map(e => e == 'true');
     methods and stuff but the IB project requirement kinda stupidly
     enforces a UML and 'oH eVeRyThInG iS aBsTrAcT' so here goes.
 */
-class Node {
+export class Node {
 
     constructor(line) {
         this.line = line;
@@ -56,15 +55,15 @@ class Node {
     }
 }
 
-class Exp extends Node {
+export class Exp extends Node {
     // TODO: the stack top codegen thingy
 }
 
-class Stmt extends Node {
+export class Stmt extends Node {
     // TODO: the code emit thingy
 }
 
-class LHS {
+export class LHS {
 
     preGen(context, line) {
         throw 'not implemented';
@@ -75,7 +74,7 @@ class LHS {
     }
 }
 
-class LitExp extends Exp {
+export class LitExp extends Exp {
 
     constructor(line, valType, val) {
         super(line);
@@ -90,7 +89,7 @@ class LitExp extends Exp {
     }
 }
 
-class ListExp extends Exp {
+export class ListExp extends Exp {
 
     constructor(line, arr) {
         super(line);
@@ -104,7 +103,7 @@ class ListExp extends Exp {
     }
 }
 
-class IdenExp extends Exp {
+export class IdenExp extends Exp {
 
     constructor(line, name) {
         super(line);
@@ -117,7 +116,7 @@ class IdenExp extends Exp {
     }    
 }
 
-class BinExp extends Exp {
+export class BinExp extends Exp {
 
     constructor(line, op, a, b) {
         super(line);
@@ -135,7 +134,7 @@ class BinExp extends Exp {
     }  
 }
 
-class UniExp extends Exp {
+export class UniExp extends Exp {
 
     constructor(line, op, val) {
         super(line);
@@ -151,7 +150,7 @@ class UniExp extends Exp {
     }
 }
 
-class CallExp extends Exp {
+export class CallExp extends Exp {
 
     /*
         'isMethod' is just a hacky way to hide the object
@@ -179,7 +178,7 @@ class CallExp extends Exp {
     }
 }
 
-class AsnStmt extends Stmt {
+export class AsnStmt extends Stmt {
 
     constructor(line, lhs, exp) {
         super(line);
@@ -195,7 +194,7 @@ class AsnStmt extends Stmt {
     }
 }
 
-class IfStmt extends Stmt {
+export class IfStmt extends Stmt {
 
     constructor(line, cond, ifs, elses) {
         super(line);
@@ -251,7 +250,7 @@ class IfStmt extends Stmt {
     */
 }
 
-class WhileStmt extends Stmt {
+export class WhileStmt extends Stmt {
 
     constructor(line, cond, stmts) {
         super(line);
@@ -298,7 +297,7 @@ class WhileStmt extends Stmt {
     */
 }
 
-class ForStmt extends Stmt {
+export class ForStmt extends Stmt {
 
     constructor(line, iter, from, to, stmts) {
         super(line);
@@ -371,7 +370,7 @@ class ForStmt extends Stmt {
     */
 }
 
-class BreakStmt extends Stmt {
+export class BreakStmt extends Stmt {
 
     constructor(line) {
         super(line);
@@ -389,7 +388,7 @@ class BreakStmt extends Stmt {
     }
 }
 
-class ContStmt extends Stmt {
+export class ContStmt extends Stmt {
 
     constructor(line) {
         super(line);
@@ -407,7 +406,7 @@ class ContStmt extends Stmt {
     }
 }
 
-class RetStmt extends Stmt {
+export class RetStmt extends Stmt {
 
     constructor(line, exp) {
         super(line);
@@ -427,7 +426,7 @@ class RetStmt extends Stmt {
     }
 }
 
-class FuncCallStmt extends Stmt {
+export class FuncCallStmt extends Stmt {
 
     constructor(funcExp) {
         super(funcExp.line);
@@ -441,7 +440,7 @@ class FuncCallStmt extends Stmt {
     }
 }
 
-class IdenLHS extends LHS {
+export class IdenLHS extends LHS {
 
     constructor(name) {
         super();
@@ -456,7 +455,7 @@ class IdenLHS extends LHS {
     }
 }
 
-class IdxLHS extends LHS {
+export class IdxLHS extends LHS {
 
     constructor(exp, idx) {
         super();
@@ -476,7 +475,7 @@ class IdxLHS extends LHS {
     }
 }
 
-class FuncDecl extends Node {
+export class FuncDecl extends Node {
 
     constructor(line, name, params, stmts) {
         super(line);
@@ -503,7 +502,7 @@ function getNull(start) {
 }
 
 // returns a dummy line that does not trigger a debugger break
-function dummyLine() {
+export function dummyLine() {
     return {offset: 0, line: -1, column: 0};
 }
 
@@ -565,7 +564,7 @@ function findLoop(stack) {
     return null;
 }
 
-const lang = P.createLanguage({
+export const lang = P.createLanguage({
     LHS: r => {
         return r.Exp.assert(e => {
             const isIden = e instanceof IdenExp;
@@ -832,7 +831,3 @@ const lang = P.createLanguage({
         return _.then(P.newline).skip(P.optWhitespace);
     }
 });
-
-module.exports = {
-    lang
-};

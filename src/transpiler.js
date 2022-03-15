@@ -1,3 +1,5 @@
+import { Stmt, FuncDecl, dummyLine } from './parser';
+
 class CodeGenContext {
 
     constructor() {
@@ -14,7 +16,7 @@ class CodeGenContext {
     }
 };
 
-function transpile(code) {
+export function transpile(code) {
     const funcs = [];
     const funcNames = new Set();
     const mainStmts = [];

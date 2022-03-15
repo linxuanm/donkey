@@ -1,7 +1,8 @@
-const $ = require('jquery');
-const Cookies = require('js.cookie');
+import $ from 'jquery';
+import Cookies from 'js.cookie';
 
-const { lang } = require('./parser');
+import { lang } from './parser';
+import { transpile } from './transpiler';
 
 const COOKIE_NAME = 'code';
 const config = {
@@ -143,7 +144,7 @@ function toggleClick(btn, panel) {
 function outputPrint(text, color='#D4D4D4', bold=false, raw=false) {
     const vals = {
         class: 'output-base',
-        style: `color: ${color};\
+        style: `color:${color};\
                 font-weight:${bold ? 'bold' : 'normal'};`,
     };
     vals[raw ? 'html' : 'text'] = text;
