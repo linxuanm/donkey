@@ -1,5 +1,9 @@
-const COOKIE_NAME = 'code';
+const $ = require('jquery');
+const Cookies = require('js.cookie');
 
+const { lang } = require('./parser');
+
+const COOKIE_NAME = 'code';
 const config = {
     tabSize: 4
 };

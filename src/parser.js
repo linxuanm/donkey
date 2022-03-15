@@ -1,4 +1,5 @@
-const P = Parsimmon;
+const { __esModule } = require('js.cookie');
+const P = require('parsimmon');;
 
 const ops = [
     ['*', 'div', 'mod', '/', '%'],
@@ -831,3 +832,7 @@ const lang = P.createLanguage({
         return _.then(P.newline).skip(P.optWhitespace);
     }
 });
+
+module.exports = {
+    lang
+};

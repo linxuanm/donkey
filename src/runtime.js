@@ -1,3 +1,5 @@
+const { __esModule } = require("js.cookie");
+
 const EXE_FREQ = 20;
 let currVM = null;
 
@@ -219,3 +221,14 @@ class DonkeyRuntime {
 function loadRuntime(funcs) {
     return new DonkeyRuntime(funcs);
 }
+
+module.exports = {
+    NULL,
+    STR,
+    INT,
+    REAL,
+    BOOL,
+    LIST,
+    DonkeyObject,
+    NativeFunction
+};

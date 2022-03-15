@@ -1,3 +1,5 @@
+const { NativeFunction } = require('./runtime');
+
 class CollectionInner {
 
     constructor() {
