@@ -9,27 +9,24 @@ class CollectionInner {
 }
 
 export const UN_OP = {
-    'not': (b, line) => {
+    'not': (b) => {
         b.assertType(
             'boolean',
-            '\'not\' can only be applied to boolean',
-            line
+            '\'not\' can only be applied to boolean'
         );
         return b.map(v => !v);
     },
-    '!': (b, line) => {
+    '!': (b) => {
         b.assertType(
             'boolean',
-            '\'!\' can only be applied to boolean',
-            line
+            '\'!\' can only be applied to boolean'
         );
         return b.map(v => !v);
     },
-    '-': (x, line) => {
+    '-': (x) => {
         x.assertType(
             'number',
-            '\'-\' can only be applied to numeric types',
-            line
+            '\'-\' can only be applied to numeric types'
         );
         return x.map(v => -v);
     }
@@ -39,20 +36,19 @@ export const METHODS = {
     'List': {
         '$setIndex': new Runtime.NativeFunction(
             ['lst', 'idx', 'exp'],
-            (vm, exp, line) => {
+            (vm, exp) => {
                 exp[1].assertType(
                     'integer',
-                    `Index must be of type integer, but got '${exp[1].type}'`,
-                    line
+                    `Index must be of type integer, but got '${exp[1].type}'`
                 );
                 const lst = exp[0].value;
                 const idx = exp[1].value;
                 if (idx >= lst.length || idx < 0) {
-                    throw [
-                        `Index Error: Line ${line.line}`,
+                    throw new Runtime.VMError(
+                        'Index Error',
                         `Assigning to index ${idx} of list with \
                         length ${lst.length}`
-                    ];
+                    );
                 }
 
                 lst[idx] = exp[2];
@@ -72,12 +68,12 @@ export const METHODS = {
             exp[0].value.push(exp[1]);
             vm.push(Runtime.NULL());
         }),
-        'dequeue': new Runtime.NativeFunction(['lst'], (vm, exp, line) => {
+        'dequeue': new Runtime.NativeFunction(['lst'], (vm, exp) => {
             if (exp[0].value.length === 0) {
-                throw [
-                    `Invalid Operation: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    'Invalid Operation',
                     'Dequeuing from an empty queue'
-                ];
+                );
             }
             vm.push(exp[0].value.shift());
         }),
@@ -90,12 +86,12 @@ export const METHODS = {
             exp[0].value.push(exp[1]);
             vm.push(Runtime.NULL());
         }),
-        'pop': new Runtime.NativeFunction(['lst'], (vm, exp, line) => {
+        'pop': new Runtime.NativeFunction(['lst'], (vm, exp) => {
             if (exp[0].value.length === 0) {
-                throw [
-                    `Invalid Operation: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    `Invalid Operation`,
                     'Popping from an empty stack'
-                ];
+                );
             }
             vm.push(exp[0].value.pop());
         }),
@@ -108,10 +104,8 @@ export const METHODS = {
             exp[0].value.data.push(exp[1]);
             vm.push(Runtime.NULL());
         }),
-        'addAll': new Runtime.NativeFunction(['col', 'val'], (vm, exp, line) => {
-            exp[1].assertType(
-                'List', 'Collection.addAll only adds lists', line
-            );
+        'addAll': new Runtime.NativeFunction(['col', 'val'], (vm, exp) => {
+            exp[1].assertType('List', 'Collection.addAll only adds lists');
             exp[0].value.data = exp[0].value.data.concat(exp[1].value);
             vm.push(Runtime.NULL());
         }),
@@ -125,13 +119,13 @@ export const METHODS = {
             exp[0].value.iter = 0;
             vm.push(Runtime.NULL());
         }),
-        'getNext': new Runtime.NativeFunction(['col'], (vm, exp, line) => {
+        'getNext': new Runtime.NativeFunction(['col'], (vm, exp) => {
             const col = exp[0].value;
             if (col.iter >= col.data.length) {
-                throw [
-                    `Invalid Operation: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    'Invalid Operation',
                     'Collection reached end of iteration'
-                ];
+                );
             }
             vm.push(col.data[col.iter++]);
         })
@@ -169,7 +163,7 @@ export const BIN_OP = {
     },
     '/': {
         verify: isNum,
-        calc: (a, b, line) => {
+        calc: (a, b) => {
             if (b.value == 0) throw new Runtime.VMError(
                 'Value Error', 'Division by 0'
             );
@@ -219,7 +213,7 @@ export const BIN_OP = {
     },
     'index': {
         verify: (a, b) => a === 'List' && b === 'integer',
-        calc: (a, b, line) => {
+        calc: (a, b) => {
             if (b.value >= a.value.length || b.value < 0) {
                 throw new Runtime.VMError(
                     'Index Error',
@@ -269,7 +263,7 @@ export const NATIVE_FUNCS = {
     'str': new Runtime.NativeFunction(['val'], (vm, exp) => {
         vm.push(Runtime.STR(toString(exp[0])));
     }),
-    'int': new Runtime.NativeFunction(['val'], (vm, exp, line) => {
+    'int': new Runtime.NativeFunction(['val'], (vm, exp) => {
         if (exp[0].type === 'integer') {
             vm.push(exp[0]);
         } else if (exp[0].type === 'real') {
@@ -277,21 +271,21 @@ export const NATIVE_FUNCS = {
         } else if (exp[0].type === 'string') {
             const val = parseInt(exp[0].value);
             if (isNaN(val)) {
-                throw [
-                    `Value Error: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    `Value Error`,
                     `string '${exp[0].value}' cannot be converted to an integer`
-                ];
+                );
             }
 
             vm.push(Runtime.INT(val));
         } else {
-            throw [
-                `Type Error: Line ${line.line}`,
+            throw new Runtime.VMError(
+                `Type Error`,
                 `'int()' cannot be used on type ${exp[0].type}`
-            ];
+            );
         }
     }),
-    'real': new Runtime.NativeFunction(['val'], (vm, exp, line) => {
+    'real': new Runtime.NativeFunction(['val'], (vm, exp) => {
         if (exp[0].type === 'real') {
             vm.push(exp[0]);
         } else if (exp[0].type === 'integer') {
@@ -299,27 +293,27 @@ export const NATIVE_FUNCS = {
         } else if (exp[0].type === 'string') {
             const val = parseFloat(exp[0].value);
             if (isNaN(val)) {
-                throw [
-                    `Value Error: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    'Value Error',
                     `string '${exp[0].value}' cannot be converted to a real`
-                ];
+                );
             }
 
             vm.push(Runtime.INT(val));
         } else {
-            throw [
-                `Type Error: Line ${line.line}`,
+            throw new Runtime.VMError(
+                'Type Error',
                 `'real()' cannot be used on type ${exp[0].type}`
-            ];
+            );
         }
     }),
-    'stack': new Runtime.NativeFunction([], (vm, exp, line) => {
+    'stack': new Runtime.NativeFunction([], (vm, exp) => {
         vm.push(new Runtime.DonkeyObject('Stack', []));
     }),
-    'queue': new Runtime.NativeFunction([], (vm, exp, line) => {
+    'queue': new Runtime.NativeFunction([], (vm, exp) => {
         vm.push(new Runtime.DonkeyObject('Queue', []));
     }),
-    'collection': new Runtime.NativeFunction([], (vm, exp, line) => {
+    'collection': new Runtime.NativeFunction([], (vm, exp) => {
         vm.push(new Runtime.DonkeyObject('Collection', new CollectionInner()));
     }),
     '$input': new Runtime.NativeFunction([], (vm, exp) => {

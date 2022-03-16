@@ -131,7 +131,7 @@ export class CodeInvoke extends OpCode {
             );
         }
 
-        func.invoke(vm, exps, this.line);
+        func.invoke(vm, exps);
     }
 }
 

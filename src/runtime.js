@@ -110,8 +110,8 @@ export class NativeFunction extends AbstractFunction {
         this.wrapped = wrapped;
     }
 
-    invoke(vm, exps, line) {
-        this.wrapped(vm, exps, line);
+    invoke(vm, exps) {
+        this.wrapped(vm, exps);
     }
 }
 
