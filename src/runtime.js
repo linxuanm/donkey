@@ -163,22 +163,25 @@ export class DonkeyRuntime {
         this.funcFrames.push(frame);
 
         global.currVM = setInterval(() => {
-            try {
-                for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
+            for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
+                try {
                     this.currFrame().execute(this);
+                } catch (error) {
+                    if (error instanceof VMError) {
+                        this.handles.error(error.formatMsg(this));
+                        return;
+                    } else {
+                        this.handles.error([
+                            'Unexpected Internal Error',
+                            'Check log and report to author'
+                        ]);
+                        throw error;
+                    }
                 }
+            }
 
-                if (this.funcFrames.length === 0) {
-                    clearInterval(global.currVM);
-                    global.currVM = null;
-                    Editor.printBold('Program End', '#00CDAF');
-                    Editor.stopCode();
-                }
-            } catch (error) {
-                clearInterval(global.currVM);
-                global.currVM = null;
-                Editor.printError(error);
-                Editor.stopCode();
+            if (this.funcFrames.length === 0) {
+                this.handles.exit();
             }
         }, 1);
     }
@@ -200,10 +203,6 @@ export class DonkeyRuntime {
     }
 }
 
-export function loadRuntime(funcs, debugMode) {
-    return new DonkeyRuntime(funcs, debugMode);
-}
-
 export class VMError {
 
     constructor(type, msg) {
@@ -212,8 +211,14 @@ export class VMError {
     }
 
     formatMsg(vm) {
+        const currFrame = vm.currFrame();
+        /*
+            ptr - 1 to get the innstruction that was just executed as the
+            ptr is incremented before executing an instruction
+        */
+        const prevIdx = currFrame.pc - 1;
         return [
-            `${this.type}: Line ${vm.currFrame().pc}`,
+            `${this.type}: Line ${currFrame.code[prevIdx].line.line}`,
             this.msg
         ];
     }

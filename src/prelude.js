@@ -1,5 +1,4 @@
 import * as Runtime from './runtime';
-import * as Editor from './editor';
 
 class CollectionInner {
 
@@ -171,20 +170,18 @@ export const BIN_OP = {
     '/': {
         verify: isNum,
         calc: (a, b, line) => {
-            if (b.value == 0) throw [
-                `Value Error: Line ${line.line}`,
-                `Division by 0`
-            ];
+            if (b.value == 0) throw new Runtime.VMError(
+                'Value Error', 'Division by 0'
+            );
             return new Runtime.DonkeyObject('real', a.value / b.value);
         }
     },
     '%': {
         verify: isNum,
         calc: (a, b) => {
-            if (b.value == 0) throw [
-                `Value Error: Line ${line.line}`,
-                `Division by 0`
-            ];
+            if (b.value == 0) throw new Runtime.VMError(
+                'Value Error', 'Division by 0'
+            );
             return new Runtime.DonkeyObject(comb(a, b), a.value % b.value);
         }
     },
@@ -266,7 +263,7 @@ function toString(exp) {
 
 export const NATIVE_FUNCS = {
     '$output': new Runtime.NativeFunction(['msg'], (vm, exp) => {
-        Editor.print(toString(exp[0]));
+        vm.handles.print(toString(exp[0]));
         vm.push(Runtime.NULL());
     }),
     'str': new Runtime.NativeFunction(['val'], (vm, exp) => {

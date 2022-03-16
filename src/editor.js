@@ -42,16 +42,30 @@ function parseAndRun(code, debugMode=false) {
         return;
     }
 
-    let trans;
+    let funcs;
     try {
-        trans = transpile(result.value);
+        funcs = transpile(result.value);
     } catch (error) {
         printError(error);
         stopCode();
         return;
     }
 
-    const runtime = Runtime.loadRuntime(trans, debugMode);
+    const handles = {
+        print(msg, color='#D4D4D4') {
+            print(msg, color);
+        },
+        error(msgs) {
+            printError(msgs);
+            terminate();
+        },
+        exit() {
+            printBold('Program End', '#00CDAF');
+            terminate();
+        }
+    };
+
+    const runtime = new Runtime.DonkeyRuntime(funcs, debugMode, handles);
     runtime.runMain();
 }
 
@@ -92,7 +106,7 @@ function saveCode() {
     let code = $('#code').val();
     code = encodeURIComponent(code);
 
-    Cookies.set(COOKIE_NAME, code, { path: '', expires: 365 })
+    Cookies.set(COOKIE_NAME, code, { path: '', expires: 365 });
 }
 
 function loadCode() {
@@ -122,17 +136,17 @@ function toggleClick(btn, panel) {
             panel.css('flex-grow', '1');
             panel.css('padding', '15px');
         }
-    })
+    });
 }
 
-export function printBold(text, color='#D4D4D4') {
+export function printBold(text, color) {
     print(`<strong>${text}</strong>`, color, true);
 }
 
-export function print(text, color='#D4D4D4', raw=false) {
+export function print(text, color, raw=false) {
     const vals = {
         class: 'output-base',
-        style: `color:${color};`,
+        style: `color:${color};`
     };
     vals[raw ? 'html' : 'text'] = text;
     $('#output-panel').append($('<div>', vals));

@@ -722,12 +722,12 @@ export const lang = P.createLanguage({
             if (e.params.length !== 0) {
                 const ref = e.params[0];
                 if (!(ref instanceof LitExp && ref.valType === 'string')) {
-                    e.params[0] = new CallExp(dummyLine, 'str', [ref], false);
+                    e.params[0] = new CallExp(dummyLine(), 'str', [ref], false);
                 }
 
                 joined = e.params.reduce((a, b) => {
                     if (!(b instanceof LitExp && b.valType === 'string')) {
-                        b = new CallExp(dummyLine, 'str', [b], false);
+                        b = new CallExp(dummyLine(), 'str', [b], false);
                     }
                     return new BinExp(e.line.start, '+', a, b);
                 });
