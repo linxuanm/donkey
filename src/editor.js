@@ -13,28 +13,17 @@ const editorInfo = {
     lineNo: 1,
 };
 
-function runCode() {
+function runCode(debugMode = false) {
     saveCode();
-    updateStatusText('Executing');
+    updateStatusText(debugMode ? 'Debugging' : 'Executing');
+
     $('.main-action').hide();
-    $('.run-action').show();
+    $(`.${debugMode ? 'debug' : 'run'}-action`).show();
 
     $('#output-panel').empty();
-    outputPrint('Program Start', '#00CDAF', true);
+    outputPrint(`${debugMode ? 'Debugger' : 'Program'} Start`, '#00CDAF', true);
 
-    parseAndRun($('#code').val());
-}
-
-function debugCode() {
-    saveCode();
-    updateStatusText('Debugging');
-    $('.main-action').hide();
-    $('.debug-action').show();
-
-    $('#output-panel').empty();
-    outputPrint('Debugger Start', '#00CDAF', true);
-
-    parseAndRun($('#code').val(), true);
+    parseAndRun($('#code').val(), debugMode);
 }
 
 function parseAndRun(code, debugMode=false) {
@@ -62,7 +51,7 @@ function parseAndRun(code, debugMode=false) {
         return;
     }
 
-    const runtime = Runtime.loadRuntime(trans);
+    const runtime = Runtime.loadRuntime(trans, debugMode);
     runtime.runMain();
 }
 
@@ -95,7 +84,7 @@ export function printError(errs, headerFirst=true) {
 function showError(text, header=true, color='#FF3843') {
     if (header) {
         outputPrint(
-            'Your program failed, you donkey',
+            'Your program failed, just like your life',
             color,
             true
         );
@@ -116,7 +105,7 @@ function loadCode() {
     const area = $('#code');
     const old = Cookies.get(COOKIE_NAME);
 
-    if (old === undefined) return;
+    if (old === undefined || old === null) return;
 
     const content = decodeURIComponent(old);
     area.val(content);
@@ -267,8 +256,8 @@ $(function() {
         updateCaretPos(lines.length, col);
     });
 
-    $('#run-code').click(runCode);
-    $('#debug-code').click(debugCode);
+    $('#run-code').click(() => runCode(false));
+    $('#debug-code').click(() => runCode(true));
     $('#stop-code').click(emitStop);
 
     toggleClick($('#output-btn'), $('#output-panel'));

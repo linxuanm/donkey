@@ -138,10 +138,11 @@ class FunctionFrame {
 
 export class DonkeyRuntime {
 
-    constructor(funcs) {
+    constructor(funcs, debugMode) {
         this.funcFrames = [];
         this.stack = [];
         this.mainEnv = {};
+        this.debugMode = debugMode;
 
         this.funcs = {};
         for (var i of funcs) {
@@ -198,8 +199,8 @@ export class DonkeyRuntime {
     }
 }
 
-export function loadRuntime(funcs) {
-    return new DonkeyRuntime(funcs);
+export function loadRuntime(funcs, debugMode) {
+    return new DonkeyRuntime(funcs, debugMode);
 }
 
 export class VMError {
