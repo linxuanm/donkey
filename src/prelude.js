@@ -266,7 +266,7 @@ function toString(exp) {
 
 export const NATIVE_FUNCS = {
     '$output': new Runtime.NativeFunction(['msg'], (vm, exp) => {
-        Editor.outputPrint(toString(exp[0]));
+        Editor.print(toString(exp[0]));
         vm.push(Runtime.NULL());
     }),
     'str': new Runtime.NativeFunction(['val'], (vm, exp) => {

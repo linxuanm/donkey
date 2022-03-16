@@ -138,11 +138,12 @@ class FunctionFrame {
 
 export class DonkeyRuntime {
 
-    constructor(funcs, debugMode) {
+    constructor(funcs, debugMode, handles) {
         this.funcFrames = [];
         this.stack = [];
         this.mainEnv = {};
         this.debugMode = debugMode;
+        this.handles = handles;
 
         this.funcs = {};
         for (var i of funcs) {
@@ -170,7 +171,7 @@ export class DonkeyRuntime {
                 if (this.funcFrames.length === 0) {
                     clearInterval(global.currVM);
                     global.currVM = null;
-                    Editor.outputPrint('Program End', '#00CDAF', true);
+                    Editor.printBold('Program End', '#00CDAF');
                     Editor.stopCode();
                 }
             } catch (error) {

@@ -21,7 +21,7 @@ function runCode(debugMode = false) {
     $(`.${debugMode ? 'debug' : 'run'}-action`).show();
 
     $('#output-panel').empty();
-    outputPrint(`${debugMode ? 'Debugger' : 'Program'} Start`, '#00CDAF', true);
+    printBold(`${debugMode ? 'Debugger' : 'Program'} Start`, '#00CDAF');
 
     parseAndRun($('#code').val(), debugMode);
 }
@@ -55,12 +55,10 @@ function parseAndRun(code, debugMode=false) {
     runtime.runMain();
 }
 
-function emitStop() {
+function terminate() {
     if (global.currVM !== null) {
         clearInterval(global.currVM);
         global.currVM = null;
-
-        showError('Program Aborted', false);
     } else {
         console.log('Emitting stop signal but there is no active runtime');
     }
@@ -81,17 +79,13 @@ export function printError(errs, headerFirst=true) {
     errs.map((s, i) => showError(s, headerFirst && i === 0));
 }
 
-function showError(text, header=true, color='#FF3843') {
+function showError(text, header=true) {
     if (header) {
-        outputPrint(
-            'Your program failed, just like your life',
-            color,
-            true
-        );
-        outputPrint('='.repeat(15), color, true);
+        printBold('Your program failed, just like your life', '#FF3843');
+        printBold('='.repeat(15), '#FF3843');
     }
 
-    outputPrint(text, color, true);
+    printBold(text, '#FF3843');
 }
 
 function saveCode() {
@@ -131,11 +125,14 @@ function toggleClick(btn, panel) {
     })
 }
 
-export function outputPrint(text, color='#D4D4D4', bold=false, raw=false) {
+export function printBold(text, color='#D4D4D4') {
+    print(`<strong>${text}</strong>`, color, true);
+}
+
+export function print(text, color='#D4D4D4', raw=false) {
     const vals = {
         class: 'output-base',
-        style: `color:${color};\
-                font-weight:${bold ? 'bold' : 'normal'};`,
+        style: `color:${color};`,
     };
     vals[raw ? 'html' : 'text'] = text;
     $('#output-panel').append($('<div>', vals));
@@ -256,9 +253,12 @@ $(function() {
         updateCaretPos(lines.length, col);
     });
 
-    $('#run-code').click(() => runCode(false));
-    $('#debug-code').click(() => runCode(true));
-    $('#stop-code').click(emitStop);
+    $('#run-code').on('click', () => runCode(false));
+    $('#debug-code').on('click', () => runCode(true));
+    $('#stop-code').on('click', () => {
+        showError('Program Aborted', false);
+        terminate();
+    });
 
     toggleClick($('#output-btn'), $('#output-panel'));
     toggleClick($('#debug-btn'), $('#debugger-panel'));
