@@ -89,14 +89,14 @@ export function stopCode() {
 
 export function printError(errs, headerFirst=true) {
     // '$' is special simple to differentiate info msgs with expected symbols
-    console.log(errs);
     errs.map((s, i) => showError(s, headerFirst && i === 0));
 }
 
 function showError(text, header=true) {
     if (header) {
-        printBold('Your program failed, just like your life', '#FF3843');
-        printBold('='.repeat(15), '#FF3843');
+        const roast = 'Your program failed, just like your life';
+        printBold(roast, '#FF3843');
+        printBold('='.repeat(20), '#FF3843');
     }
 
     printBold(text, '#FF3843');

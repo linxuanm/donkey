@@ -44,28 +44,22 @@ export class DonkeyObject {
         return new DonkeyObject(this.type, this.value);
     }
 
-    assertType(s, msg, line) {
+    assertType(s, msg) {
         if (s === 'number') {
             if (this.type !== 'integer' && this.type !== 'real') {
-                throw [
-                    `Type Error: Line ${line.line}`,
-                    msg
-                ];
+                throw new VMError(`Type Error`, msg);
             }
 
-            return
+            return;
         }
-        if (s !== this.type) throw [
-            `Type Error: Line ${line.line}`,
-            msg
-        ];
+
+        if (s !== this.type) throw new VMError(`Type Error`, msg);
     }
 
-    bool(line) {
+    bool() {
         this.assertType(
             'boolean',
-            `Type ${this.type} cannot be interpreted as a boolean`,
-            line
+            `Type ${this.type} cannot be interpreted as a boolean`
         );
         return this.value;
     }

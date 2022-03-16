@@ -229,11 +229,11 @@ export class IfStmt extends Stmt {
         this.endLabel = incre;
 
         this.cond.codeGen(context);
-        context.code.push(new Code.CodeJumpIf(dummyLine(), this.ifLabel));
+        context.code.push(new Code.CodeJumpIf(this.line, this.ifLabel));
         context.push(this);
 
         this.elses.forEach(e => e.codeGen(context));
-        context.code.push(new Code.CodeJump(dummyLine(), this.endLabel));
+        context.code.push(new Code.CodeJump(this.line, this.endLabel));
 
         this.ifs.forEach(e => e.codeGen(context));
 
@@ -276,14 +276,14 @@ export class WhileStmt extends Stmt {
         incre++;
         this.breakLabel = incre;
 
-        context.code.push(new Code.CodeJump(dummyLine(), this.contLabel));
+        context.code.push(new Code.CodeJump(this.line, this.contLabel));
 
         context.stack.push(this);
         this.stmts.forEach(e => e.codeGen(context));
         context.stack.pop();
 
         this.cond.codeGen(context);
-        context.code.push(new Code.CodeJumpIf(dummyLine(), this.repLabel));
+        context.code.push(new Code.CodeJumpIf(this.line, this.repLabel));
     }
 
     /*
@@ -333,9 +333,9 @@ export class ForStmt extends Stmt {
         incre++;
 
         this.from.codeGen(context);
-        context.code.push(new Code.CodeStoreVar(dummyLine(), this.iter));
+        context.code.push(new Code.CodeStoreVar(this.line, this.iter));
         this.to.codeGen(context);
-        context.code.push(new Code.CodeJump(dummyLine(), this.initLabel));
+        context.code.push(new Code.CodeJump(this.line, this.initLabel));
 
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
@@ -343,14 +343,14 @@ export class ForStmt extends Stmt {
 
         context.code.push(new Code.CodeLoadVar(this.line, this.iter));
         const one = new Runtime.DonkeyObject('integer', 1);
-        context.code.push(new Code.CodeLoadLit(dummyLine(), one));
-        context.code.push(new Code.CodeBinOp(dummyLine(), '+'));
-        context.code.push(new Code.CodeStoreVar(dummyLine(), this.iter));
+        context.code.push(new Code.CodeLoadLit(this.line, one));
+        context.code.push(new Code.CodeBinOp(this.line, '+'));
+        context.code.push(new Code.CodeStoreVar(this.line, this.iter));
 
         context.code.push(new Code.CodeForTest(this.line, this.iter));
-        context.code.push(new Code.CodeJumpIf(dummyLine(), this.repLabel));
+        context.code.push(new Code.CodeJumpIf(this.line, this.repLabel));
 
-        context.code.push(new Code.CodePop(dummyLine()));
+        context.code.push(new Code.CodePop(this.line));
     }
 
     /*
@@ -383,7 +383,7 @@ export class BreakStmt extends Stmt {
     codeGen(context) {
         const loop = findLoop(context.stack);
         if (loop === null) throw [
-            `Code Structure Error: Line ${this.line.line}`, 
+            `Line ${this.line.line}: Code Structure Error`, 
             'Break statement outside of loop'
         ];
 
@@ -401,7 +401,7 @@ export class ContStmt extends Stmt {
     codeGen(context) {
         const loop = findLoop(context.stack);
         if (loop === null) throw [
-            `Code Structure Error: Line ${this.line.line}`, 
+            `Line ${this.line.line}: Code Structure Error`, 
             'Continue statement outside of loop'
         ];
 
@@ -420,7 +420,7 @@ export class RetStmt extends Stmt {
     codeGen(context) {
         const func = context.stack[0];
         if (func.name === '$main') throw [
-            `Code Structure Error: Line ${this.line.line}`, 
+            `Line ${this.line.line}: Code Structure Error`, 
             'Return statement outside of function'
         ];
 
@@ -439,7 +439,7 @@ export class FuncCallStmt extends Stmt {
 
     codeGen(context) {
         this.funcExp.codeGen(context);
-        context.code.push(new Code.CodePop(dummyLine()));
+        context.code.push(new Code.CodePop(this.line));
     }
 }
 
@@ -492,8 +492,8 @@ export class FuncDecl extends Node {
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
         if (!(context.code[context.code.length - 1] instanceof Code.CodeRet)) {
-            context.code.push(new Code.CodeLoadLit(dummyLine(), Runtime.NULL()));
-            context.code.push(new Code.CodeRet(dummyLine()));
+            context.code.push(new Code.CodeLoadLit(this.line, Runtime.NULL()));
+            context.code.push(new Code.CodeRet(this.line));
         }
 
         context.pop(this);
