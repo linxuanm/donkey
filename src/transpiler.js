@@ -29,12 +29,12 @@ export function transpile(code) {
             const name = i.name;
             if (Prelude.PRELUDE_FUNCS_NAME.has(name)) {
                 throw [
-                    `Structure Error: Line ${i.line.line}`,
+                    `Line ${i.line.line}: Structure Error`,
                     `Function name conflicts with native function: ${name}`
                 ];
             } else if (funcNames.has(name)) {
                 throw [
-                    `Structure Error: Line ${i.line.line}`,
+                    `Line ${i.line.line}: Structure Error`,
                     `Duplicate function name: ${name}`
                 ];
             }

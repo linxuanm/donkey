@@ -419,10 +419,10 @@ export class RetStmt extends Stmt {
 
     codeGen(context) {
         const func = context.stack[0];
-        if (func.name === '$main') throw [
+        if (func.name === '$main') throw new Runtime.VMError(
             `Line ${this.line.line}: Code Structure Error`, 
             'Return statement outside of function'
-        ];
+        );
 
         this.exp.codeGen(context);
         context.code.push(new Code.CodeRet(this.line));

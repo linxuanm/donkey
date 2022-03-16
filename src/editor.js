@@ -46,9 +46,16 @@ function parseAndRun(code, debugMode=false) {
     try {
         funcs = transpile(result.value);
     } catch (error) {
-        printError(error);
-        stopCode();
-        return;
+        if (Array.isArray(error)) {
+            printError(error);
+            stopCode();
+        } else {
+            printError([
+                'Unexpected Internal Error',
+                'Check log and report to author'
+            ]);
+            throw error;
+        }
     }
 
     const handles = {

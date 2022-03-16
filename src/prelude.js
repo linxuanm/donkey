@@ -221,10 +221,10 @@ export const BIN_OP = {
         verify: (a, b) => a === 'List' && b === 'integer',
         calc: (a, b, line) => {
             if (b.value >= a.value.length || b.value < 0) {
-                throw [
-                    `Index Error: Line ${line.line}`,
+                throw new Runtime.VMError(
+                    'Index Error',
                     `Accessing index ${b.value} of list with length ${a.value.length}`
-                ];
+                );
             }
             return a.value[b.value];
         }

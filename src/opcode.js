@@ -7,10 +7,10 @@ function loadVar(name, vm, frame, line) {
     } else if (name in vm.mainEnv) {
         return vm.mainEnv[name];
     } else {
-        throw [
-            `Name Error: Line ${line.line}`,
+        throw new Runtime.VMError(
+            'Name Error',
             `Variable '${name}' is undefined`
-        ];
+        );
     }
 }
 
@@ -106,10 +106,10 @@ export class CodeInvoke extends OpCode {
         if (this.isMethod) {
             const methods = Prelude.METHODS[exps[0].type] || {};
             if (!(this.name in methods)) {
-                throw [
-                    `Name Error: Line ${this.line.line}`,
+                throw new Runtime.VMError(
+                    'Name Error',
                     `Type '${exps[0].type}' does not have method '${this.name}'`
-                ];
+                );
             }
             func = methods[this.name];
         } else if (this.name in vm.funcs) {
@@ -117,18 +117,18 @@ export class CodeInvoke extends OpCode {
         } else if (this.name in Prelude.NATIVE_FUNCS) {
             func = Prelude.NATIVE_FUNCS[this.name];
         } else {
-            throw [
-                `Name Error: Line ${this.line.line}`,
+            throw new Runtime.VMError(
+                'Name Error',
                 `Function '${this.name}' is not defined`
-            ];
+            );
         }
 
         if (func.params.length !== this.nParams) {
-            throw [
-                `Invocation Error: Line ${this.line.line}`,
+            throw new Runtime.VMError(
+                'Invocation Error',
                 `Function '${this.name}' called with ${this.nParams} \
                 parameters but expected ${func.params.length}`
-            ];
+            );
         }
 
         func.invoke(vm, exps, this.line);
@@ -170,11 +170,11 @@ export class CodeBinOp extends OpCode {
 
         const operator = Prelude.BIN_OP[this.op];
         if (!operator.verify(a.type, b.type)) {
-            throw [
-                `Type Error: Line ${this.line.line}`,
+            throw new Runtime.VMError(
+                'Type Error',
                 `Operator '${this.op}' is undefined for \
                 type '${a.type}' and '${b.type}'`
-            ];
+            );
         }
 
         vm.push(operator.calc(a, b, this.line));
@@ -255,11 +255,11 @@ export class CodeForTest extends OpCode {
 
         const ref = loadVar(this.name, vm, frame, this.line);
         if (!Prelude.BIN_OP['<='].verify(ref.type, top.type)) {
-            throw [
-                `Type Error: Line ${this.line.line}`,
+            throw new Runtime.VMError(
+                'Type Error',
                 `For loop requires numeric bounds, but has acculator \
                 of type ${ref.type} and target value of type ${top.type}`
-            ];
+            );
         }
         vm.push(Prelude.BIN_OP['<='].calc(ref, top));
     }
