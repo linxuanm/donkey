@@ -79,6 +79,11 @@ export const METHODS = {
         }),
         'isEmpty': new Runtime.NativeFunction(['lst'], (vm, exp) => {
             vm.push(Runtime.BOOL(exp[0].value.length === 0));
+        }),
+        'addAll': new Runtime.NativeFunction(['col', 'val'], (vm, exp) => {
+            exp[1].assertType('List', 'Queue.addAll only adds lists');
+            exp[0].value = exp[0].value.concat(exp[1].value);
+            vm.push(Runtime.NULL());
         })
     },
     'Stack': {
@@ -97,6 +102,11 @@ export const METHODS = {
         }),
         'isEmpty': new Runtime.NativeFunction(['lst'], (vm, exp) => {
             vm.push(Runtime.BOOL(exp[0].value.length === 0));
+        }),
+        'addAll': new Runtime.NativeFunction(['col', 'val'], (vm, exp) => {
+            exp[1].assertType('List', 'Stack.addAll only adds lists');
+            exp[0].value = exp[0].value.concat(exp[1].value);
+            vm.push(Runtime.NULL());
         })
     },
     'Collection': {
