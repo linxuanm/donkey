@@ -34,7 +34,7 @@ All basic values are pass-by-value, while all compound values are pass-by-refere
 
 Note that there is no variable declaration; assigning a value to a variable automatically "declares" it.
 
-In addition, all variables should be capitalized according to the IB Pseudocode standard. However this isn't enforced in Donkey IDE, as there has been numerous cases where IB uses lower-case variable names in official documents (which is erroneous, but considering this is IB CS, what did you expect?). Nonetheless, this documentation will adhere to using capitalized variable names.
+In addition, all variables should be capitalized according to the IB Pseudocode standard. However this isn't enforced in Donkey IDE, as there has been numerous cases where IB uses lower-case variable names in official documents (which is erroneous, but considering that this is IB CS, what did you expect?). Nonetheless, this documentation will adhere to using capitalized variable names.
 
 Type Conversions
 ----------------

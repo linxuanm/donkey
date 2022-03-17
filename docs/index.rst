@@ -15,6 +15,7 @@ Donkey Pseudocode Documentation
     :maxdepth: 2
 
     Basic Syntax <tutorials/basics>
+    Arithmetics <tutorials/arithmetics>
     Control Flow <tutorials/control>
     Compound Data Types <tutorials/complex>
     Functions <tutorials/functions>
