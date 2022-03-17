@@ -36,12 +36,29 @@ Note that there is no variable declaration; assigning a value to a variable auto
 
 In addition, all variables should be capitalized according to the IB Pseudocode standard. However this isn't enforced in Donkey IDE, as there has been numerous cases where IB uses lower-case variable names in official documents (which is erroneous, but considering this is IB CS, what did you expect?). Nonetheless, this documentation will adhere to using capitalized variable names.
 
+Type Conversions
+----------------
+
+There are a few convenient built-in functions for converting between types:
+
+- :code:`int`: Converts the given value into an integer (rounds real numbers down to the nearest integer, and parses strings into the integer that they represent).
+- :code:`real`: Converts the given value into a real number (changes the type of integers to 'real', and parses strings into the (floating point) number that they represent).
+- :code:`str`: Represents the given value with a string. Works on all data types.
+
+Conversion examples::
+
+    NUM_STR = "42"  // a number written as a string
+    NUM = int(NUM_STR) * 2  // "NUM" is integer 84
+
+    MY_LIST = [1, 2, 3, 4]
+    LIST_STR = str(MY_LIST)  // 'LIST_STR' is string "[1, 2, 3, 4]"
+
 Input & Output
 --------------
 
 The input statement prompts the user to input a string, and stores the value in the variable after it::
 
-    input N  // reads a string and stores it in variable 'N'
+    input N  // reads a string and stores it in variable "N"
 
 Note that :code:`N` in the above code does not have to be defined previously.
 
@@ -57,3 +74,16 @@ It is crucial to remember that all inputted values are strings, and therefore ne
     input DECIMAL
     DECIMAL = real(DECIMAL)
 
+The output statement prints a line to the program output. It has a similar syntax to the input statement::
+
+    output "Hello"  // outputs a string
+    output 123  // outputs a number
+    output N  // outputs the content of a variable
+
+The output statement also accepts multiple parameters at once; the resulting output will simply be their concatenation::
+
+    NAME = "Amy"
+    AGE = 19
+    output NAME, " is ", AGE, " years old"  // outputs "Amy is 19 years old"
+
+:code:`output` automatically connverts its parameters into strings. This behavior is identical to wrapping each parameter in the :code:`str` conversion function.
