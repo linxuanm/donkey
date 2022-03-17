@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Donkey IDE is an online developing and debugging environment for the IB Computer Science Pseudocode. Donkey supports the IB Pseudocode syntax, as well as the numerous data structures that may appear in an IB CS exam (`stack`, `queue`, `collection`, etc.).
+Donkey IDE is an online developing and debugging environment for the IB Computer Science Pseudocode. Donkey supports the IB Pseudocode syntax, as well as the numerous data structures that may appear in an IB CS exam (:code:`stack`, :code:`queue`, :code:`collection`, etc.).
 
 The current version can be accessed `here <http://code.mightymullan.com>`_.
 
