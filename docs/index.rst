@@ -17,3 +17,4 @@ Donkey Pseudocode Documentation
     Basic Syntax <tutorials/basics>
     Control Flow <tutorials/control>
     Functions <tutorials/functions>
+    Debugging <tutorials/debugging>
