@@ -1,20 +1,19 @@
-.. Donkey documentation master file, created by
-   sphinx-quickstart on Wed Mar 16 21:21:27 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to Donkey's documentation!
-==================================
+Donkey Pseudocode Documentation
+===============================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :titlesonly:
+    :caption: Overview
+    :maxdepth: 2
 
+    Introduction <introduction>
+    Contributing <contributing>
 
+.. toctree::
+    :titlesonly:
+    :caption: Tutorial
+    :maxdepth: 2
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    Basic Syntax <tutorials/basics>
+    Control Flow <tutorials/control>
+    Functions <tutorials/functions>
