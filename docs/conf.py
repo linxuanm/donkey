@@ -1,55 +1,57 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
 import sphinx_rtd_theme
 
+import pygments
+from sphinx.highlighting import lexers
+from pygments import token
 
-# -- Project information -----------------------------------------------------
 
 project = 'Donkey'
 copyright = '2022, Linxuan Ma'
 author = 'Linxuan Ma'
 
-
-# -- General configuration ---------------------------------------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
     'sphinx_rtd_theme'
 ]
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
 html_theme = 'sphinx_rtd_theme'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+keywords = [
+    'if', 'else', 'then', 'do', 'for',
+    'while', 'from', 'to', 'loop', 'end',
+    'div', 'mod', 'not', 'and', 'or'
+]
+
+statements = ['input', 'output', 'break', 'continue', 'return']
+types = ['int', 'str', 'real', 'stack', 'queue', 'collection']
+
+
+def union(strs):
+    return r'\b(' + '|'.join(f'{i}' for i in strs) + r')\b'
+
+
+class DonkeyLexer(pygments.lexer.RegexLexer):
+
+    name = 'donkey'
+
+    tokens = {
+        'root': [
+            (r'\/\/.*\n', token.Comment),
+            (union(keywords), token.Keyword),
+            (union(statements), token.Keyword.Namespace),
+            (union(types), token.Keyword.Type),
+            (r'("[^"]*")|(\'[^\']*\')', token.String),
+            (r'\s', token.Text.Whitespace),
+            (r'[_a-zA-Z][_a-zA-Z0-9]*', token.Name),
+            (r'[-!$%^&*()_+|~=`{}\[\]:;<>?,.\/]', token.Text),
+            (r'true|false|null', token.Keyword.Constant),
+            (r'-?[0-9]+(\.[0-9]+)?', token.Literal.Number),
+        ]
+    }
+
+
+pygments_style = 'friendly'
+lexers['donkey'] = DonkeyLexer()

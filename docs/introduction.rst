@@ -7,7 +7,7 @@ The current version can be accessed `here <http://code.mightymullan.com>`_.
 
 .. note::
 
-    It is common knowledge that the IB CS board is not very intelligent and, in fact, has no fucking clue as to what they are doing. This unfortunately resulted in severely contradictary behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a stricter subset of the IB Pseudocode syntax while retaining all the functionalities.
+    The IB CS board is notorious for making mistakes in official resources and exam papers. This unfortunately resulted in severely contradictary behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a stricter subset of the IB Pseudocode syntax while retaining all the functionalities.
 
 User Interface
 --------------
@@ -22,3 +22,7 @@ The labeled components are:
 1. Code editor. This is where code is written.
 2. Program output. The output of the program will be displayed here when the program is executed.
 3. Debugging output. The content of all variables will be dumped here after a breakpoint is hit (:ref:`debugging`)
+
+Press the play button in the middle to execute the code.
+
+That's it! To start writing pseudocode, check out :ref:`basics`.
