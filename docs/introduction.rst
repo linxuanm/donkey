@@ -7,7 +7,7 @@ The current version can be accessed `here <http://code.mightymullan.com>`_.
 
 .. note::
 
-    It is common knowledge that the IB CS board is not very intelligent and, in fact, has no fucking clue as to what they are doing. This unfortunately resulted in severely contradictary behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a subset of the IB Pseudocode syntax while retaining all the functionalities.
+    It is common knowledge that the IB CS board is not very intelligent and, in fact, has no fucking clue as to what they are doing. This unfortunately resulted in severely contradictary behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a stricter subset of the IB Pseudocode syntax while retaining all the functionalities.
 
 User Interface
 --------------
