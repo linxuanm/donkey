@@ -17,6 +17,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_extra_path = ['google3c1478204fd5b178.html']
 
 
 keywords = [
