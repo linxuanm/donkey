@@ -3,7 +3,7 @@
 Control Flows
 =============
 
-Control flow is the execution order and the set of instructions that will be executed in the program. In pseudocode, this includes statements such as :code:`if` and :code:`loop`, as well as complementary statements such as :code:`break` and :code:`continue`.
+Control flow defines the order and the set of instructions that will be executed in the program. In pseudocode, control flow related statements include :code:`if` and :code:`loop`, as well as complementary statements such as :code:`break` and :code:`continue`.
 
 To illustrate, here is a simple program with control flow statements::
 

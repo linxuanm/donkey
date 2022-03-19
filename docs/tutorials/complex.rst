@@ -16,8 +16,8 @@ One key distinction between compound data types and simple data types is that th
     A = [1, 2, 3]
     B = A
     B.add(4)
-    output A  // [1, 2, 3, 4]
-    output B  // [1, 2, 3, 4]
+    output A  // "[1, 2, 3, 4]"
+    output B  // "[1, 2, 3, 4]"
 
 This mimics the behavior of non-primitive data strctures in most other imperative programming languages. Such a feature can be useful when, e.g., passing a list to another function to modify it in-place.
 
@@ -35,7 +35,7 @@ An element inside a list can be accessed by its index. Note that the first eleme
     output LIST[4]  // "E"
 
     LIST[3] = "hello"
-    output LIST  // ["A", "B", "C", "hello", "E"]
+    output LIST  // '["A", "B", "C", "hello", "E"]'
 
 .. note::
 
@@ -68,13 +68,13 @@ An example of using stack::
 
     FOO = stack()
     FOO.addAll([2, 6])
-    output FOO  // Stack[2, 6]
+    output FOO  // "Stack[2, 6]"
 
+    output FOO.pop()  // "6"
     FOO.push(3)
-    output FOO.pop()  // 3
-    output FOO.pop()  // 6
-    output FOO.pop()  // 2
-    output FOO.isEmpty()  // true
+    output FOO.pop()  // "3"
+    output FOO.pop()  // "2"
+    output FOO.isEmpty()  // "true"
 
 Queue
 -----
@@ -91,3 +91,50 @@ The methods available for a queue (assuming that it is named :code:`QUEUE`) are:
     - :code:`QUEUE.dequeue()`: Removes and returns the top element of the queue.
     - :code:`QUEUE.isEmpty()`: Returns a boolean value indicating whether the queue is empty.
     - :code:`QUEUE.addAll(ELEMENTS)`: Pushes all elements in :code:`ELEMENTS` (a list) into the queue in the order given by :code:`ELEMENTS`.
+
+An example of using queue::
+
+    A = queue()
+
+    A.enqueue("A")
+    A.enqueue("B")
+    output A.dequeue()  // "A"
+    A.enqueue("C")
+    output A.dequeue()  // "B"
+    output A.dequeue()  // "C"
+
+Collection
+----------
+
+A collection is a container that provides a way to iterate through all its elements. Like a list, it is a structure containing an ordered group of values; unlike a list, it does not provide a way to index its elements. The contained elements of a collection is accessed by iterating through it by calling the :code:`getNext()` method.
+
+Each collection has an internal pointer that tracks the current element of the iteration. After a :code:`getNext()` is called, the current element is returned and the internal pointer increments to point to the next element in the collection.
+
+Attempting to continue iterating (by calling :code:`getNext()`) at the end of a collection results in an error.
+
+A collection can be created via the :code:`collection()` built-in method, which returns a newly created collection.
+
+The methods available for a collection (assuming that it is named :code:`COL`) are:
+
+    - :code:`COL.add(VALUE)`: Appends :code:`VALUE` to the end of the collection, and returns :code:`null`.
+    - :code:`COL.addAll(ELEMENTS)`: Appends all elements in :code:`ELEMENTS` (a list) into the collection in the order given by :code:`ELEMENTS`.
+    - :code:`COL.isEmpty()`: Returns a boolean value indicating whether the collection is empty.
+    - :code:`COL.resetNext()`: Resets the pointer of the collection to the beginning, and returns :code:`null`.
+    - :code:`COL.getNext()`: Returns the current element in the collection and increments the collection pointer to point to the next element.
+    - :code:`COL.hasNext()`: Returns :code:`true` if there are still elements ahead in the collection (i.e. returns :code:`false` if the collection's pointer has reached past the last element of the collection).
+
+An example of using collection::
+
+    X = collection()
+    X.addAll(["Alpha", "Beta", "Gamma", "Delta"])
+
+    loop while X.hasNext()
+        output "Name: ", X.getNext()
+    end loop
+
+    X.resetNext()
+    loop while X.hasNext()
+        output "Name again: ", X.getNext()
+    end loop
+
+The above code iterates through the collection twice with a :code:`while` loop, and prints out the names in the collection twice.
