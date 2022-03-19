@@ -21,7 +21,7 @@ html_extra_path = ['google3c1478204fd5b178.html']
 
 
 keywords = [
-    'if', 'else', 'then', 'do', 'for',
+    'if', 'else', 'then', 'do', 'for', 'until'
     'while', 'from', 'to', 'loop', 'end',
     'div', 'mod', 'not', 'and', 'or'
 ]

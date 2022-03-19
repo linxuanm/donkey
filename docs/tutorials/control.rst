@@ -83,7 +83,53 @@ In a :code:`loop until` statement, the containing statements is repeatedly execu
 
 .. note::
 
-    The :code:`loop until` statement is just a syntax sugar for the :code:`loop while` statement, but with an extra :code:`not` operator that surrounds the whole expression.
+    The :code:`loop until` statement is just a syntax sugar for the :code:`loop while` statement, but with an extra :code:`not` operator that surrounds the whole conditional value.
 
 :code:`for` Loop
 ----------------
+
+The :code:`for` loop enumerates a variable (referred to as the "loop variable") between two values (inclusive). At the end of each iteration, it increments the loop variable by 1. Note that changing the loop variable inside the loop will affect the enumeration of the :code:`for` loop.
+
+An example of the :code:`for` loop that enumerates between an interval::
+
+    CENTER = 20
+    loop I from CENTER - 10 to CENTER + 7
+        // outputs numbers from 10 to 27 (inclusive)
+        output I
+    end loop
+
+.. note::
+
+    The loop variable will still be defined after the loop has finished.
+
+Note that there is no decremental :code:`for` loop or :code:`for` loop with custom increments at the end of each iteration as the IB Pseudocode standard did not mention such feature. This behavior can be trivially implemented with a :code:`while` loop though.
+
+:code:`break` and :code:`continue`
+----------------------------------
+
+The :code:`break` and :code:`continue` statements are used for early-terminating a loop and jump to next iteration respectively.
+
+The :code:`break` statement exits the current (inner-most) loop immediately, abandoning the rest of the unexecuted statements in the current iteration as well as any subsequent iterations.
+
+For instance, the following code locates the index of the first occurence of 5 in array :code:`ARR`::
+
+    loop I from 0 to ARR.length()
+        if ARR[I] == 5 then
+            output "5 found at index ", I
+            break
+        end if
+    end loop
+
+The :code:`continue` statement jumps to the end of the current iteration, abandoning all unexecuted code in the current iteration.
+
+For instance, the following code prints out all even numbers from 0 to 100::
+
+    loop I from 0 to 100
+        if I % 2 == 1 then
+            continue
+        end if
+
+        output I
+    end loop
+
+The :code:`break` and :code:`continue` works on both :code:`for` and :code:`while` loops.
