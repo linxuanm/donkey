@@ -113,7 +113,7 @@ The :code:`break` statement exits the current (inner-most) loop immediately, aba
 
 For instance, the following code locates the index of the first occurence of 5 in array :code:`ARR`::
 
-    loop I from 0 to ARR.length()
+    loop I from 0 to ARR.length() - 1
         if ARR[I] == 5 then
             output "5 found at index ", I
             break
