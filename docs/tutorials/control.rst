@@ -49,12 +49,12 @@ Note that :code:`if` can be nested inside :code:`else`. This is just a syntax su
 is equivalent to::
 
     if X > 10 then
-        output "X is greater than 10"
+        output "value is greater than 10"
     else
         if X < 10 then
-            output "X is less than 10"
+            output "value is less than 10"
         else
-            output "X is equal to 10"
+            output "value is equal to 10"
         end if
     end if
 
@@ -77,7 +77,7 @@ In a :code:`loop until` statement, the containing statements is repeatedly execu
 
     X = 0
     loop until X > 100
-        output "X is not greater than 100"
+        output X, " is not greater than 100"
         X = X + 1
     end loop
 
