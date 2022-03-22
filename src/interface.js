@@ -3,7 +3,8 @@ import Cookies from 'js.cookie';
 
 import { lang } from './parser';
 import { transpile } from './transpiler';
-import * as Runtime from './runtime'
+import * as Runtime from './runtime';
+import * as Editor from './editor';
 
 const COOKIE_NAME = 'code';
 const config = {
@@ -188,6 +189,8 @@ function updateCaretPos(line, col) {
 }
 
 $(function() {
+    Editor.initEditor();
+
     const container = $('#line-container');
     const codeArea = $('#code');
     updateLineNo(container, editorInfo.lineNo);
