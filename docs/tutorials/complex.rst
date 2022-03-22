@@ -19,7 +19,7 @@ One key distinction between compound data types and simple data types is that th
     output A  // "[1, 2, 3, 4]"
     output B  // "[1, 2, 3, 4]"
 
-This mimics the behavior of non-primitive data strctures in most other imperative programming languages. Such a feature can be useful when, e.g., passing a list to another function to modify it in-place.
+This mimics the behavior of non-primitive data structures in most other imperative programming languages. Such a feature can be useful when, e.g., passing a list to another function to modify it in-place.
 
 List
 ----
@@ -39,7 +39,7 @@ An element inside a list can be accessed by its index. Note that the first eleme
 
 .. note::
 
-    The word "array" may sometimes appear in this guide. In the scope of IB Pseudocode, "array" is a synonym "list", as the official documents often mix the two terms, and make no attempt to discern the difference between them.
+    The word "array" may sometimes appear in this guide. In the scope of IB Pseudocode, "array" is a synonym for "list", as the official documents often mix the two terms, and make no attempt to discern the difference between them.
 
 The methods available for a list (assuming that it is named :code:`LIST`) are:
 
