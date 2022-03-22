@@ -1,1 +1,1 @@
-import * as Editor from './editor';
+import * as Interface from './interface';

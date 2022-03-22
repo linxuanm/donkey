@@ -1,5 +1,3 @@
-import * as Editor from './editor';
-
 const EXE_FREQ = 50;
 global.currVM = null;
 
