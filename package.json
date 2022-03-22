@@ -18,6 +18,7 @@
   "homepage": "https://github.com/davidmaamoaix/donkey",
   "dependencies": {
     "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/lang-javascript": "^0.19.7",
     "browser-resolve": "^2.0.0",
     "browser-sync": "^2.27.9",
     "jquery": "^3.6.0",

@@ -3,7 +3,7 @@ import { EditorState } from "@codemirror/state"
 import { history, historyKeymap } from "@codemirror/history"
 import { indentOnInput } from "@codemirror/language"
 import { lineNumbers, highlightActiveLineGutter } from "@codemirror/gutter"
-import { defaultKeymap } from "@codemirror/commands"
+import { defaultKeymap, indentWithTab } from "@codemirror/commands"
 import { bracketMatching } from "@codemirror/matchbrackets"
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets"
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search"
@@ -32,9 +32,6 @@ export const monaco = EditorView.theme({
         padding: "10px 0 10px 0",
         caretColor: "#F00"
     },
-    ".cm-cursor": {
-        color: "#F00"
-    },
     ".cm-line": {
         paddingLeft: "10px",
         paddingRight: "10px"
@@ -46,6 +43,9 @@ export const monaco = EditorView.theme({
     ".cm-lineNumbers": {
         width: "100%"
     },
+    ".cm-lineNumbers .cm-gutterElement": {
+        paddingRight: "8px"
+    },
     "&.cm-focused .cm-selectionBackground, ::selection": {
         backgroundColor: "#174F7C"
     },
@@ -53,6 +53,9 @@ export const monaco = EditorView.theme({
         backgroundColor: "#00000000",
         outline: "1px solid #A3A3A3"
     },
+    ".cm-cursor": {
+        borderLeftColor: "#D4D4D4"
+    }
 }, {dark: true});
 
 export const donkeySetup = [
@@ -69,9 +72,10 @@ export const donkeySetup = [
     highlightActiveLine(),
     highlightSelectionMatches(),
     keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap
+        indentWithTab,
+        ...closeBracketsKeymap,
+        ...defaultKeymap,
+        ...searchKeymap,
+        ...historyKeymap
     ])
   ];
