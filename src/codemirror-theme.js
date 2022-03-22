@@ -1,5 +1,5 @@
 import { keymap, drawSelection, highlightActiveLine } from "@codemirror/view"
-import { EditorState } from "@codemirror/state"
+import { EditorSelection, EditorState } from "@codemirror/state"
 import { history, historyKeymap } from "@codemirror/history"
 import { indentOnInput } from "@codemirror/language"
 import { lineNumbers, highlightActiveLineGutter } from "@codemirror/gutter"
@@ -10,6 +10,7 @@ import { searchKeymap, highlightSelectionMatches } from "@codemirror/search"
 import { rectangularSelection } from "@codemirror/rectangular-selection"
 import { defaultHighlightStyle } from "@codemirror/highlight"
 import { EditorView } from "@codemirror/view";
+import { indentUnit, getIndentation, indentService } from "@codemirror/language";
 
 export const monaco = EditorView.theme({
     "&": {
@@ -30,7 +31,6 @@ export const monaco = EditorView.theme({
     },
     ".cm-content": {
         padding: "10px 0 10px 0",
-        caretColor: "#F00"
     },
     ".cm-line": {
         paddingLeft: "10px",
@@ -58,12 +58,70 @@ export const monaco = EditorView.theme({
     }
 }, {dark: true});
 
+function changeBySelection(state, f) {
+    let curr = -1;
+
+    return state.changeByRange(range => {
+        const changes = [];
+        for (let pos = range.from; pos <= range.to;) {
+            const line = state.doc.lineAt(pos);
+
+            if (line.number > curr && (range.empty || range.to > line.from)) {
+                f(line, changes, range);
+                curr = line.number;
+            }
+
+            pos = line.to + 1;
+        }
+
+        const changed = state.changes(changes);
+        return {
+            changes,
+            range: EditorSelection.range(
+                changed.mapPos(range.anchor, 1),
+                changed.mapPos(range.head, 1)
+            )
+        };
+    });
+}
+
+const indentNextLine = ({state, dispatch}) => {
+    if (state.readOnly) return false;
+    
+    const updated = state.changeByRange(range => {
+        const line = state.doc.lineAt(range.from);
+        const content = line.text;
+        console.log(content);
+
+        const changes = [{
+            from: range.from,
+            to: range.to,
+            insert: '\n' + ' '.repeat(1)
+        }];
+
+        const changed = state.changes(changes);
+        return {
+            changes,
+            range: EditorSelection.range(
+                changed.mapPos(range.anchor, 1),
+                changed.mapPos(range.head, 1)
+            )
+        };
+    });
+    
+    dispatch(state.update(updated, {userEvent: "input.indent"}));
+    return true;
+};
+
+const preserveIndent = {key: "Enter", run: indentNextLine};
+
 export const donkeySetup = [
     lineNumbers(),
     highlightActiveLineGutter(),
     history(),
     drawSelection(),
     EditorState.allowMultipleSelections.of(true),
+    indentUnit.of("    "),
     indentOnInput(),
     defaultHighlightStyle.fallback,
     bracketMatching(),
@@ -72,6 +130,7 @@ export const donkeySetup = [
     highlightActiveLine(),
     highlightSelectionMatches(),
     keymap.of([
+        preserveIndent,
         indentWithTab,
         ...closeBracketsKeymap,
         ...defaultKeymap,
