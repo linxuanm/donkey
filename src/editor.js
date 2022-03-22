@@ -15,7 +15,14 @@ export function getEditorContent() {
 }
 
 export function setEditorContent(code) {
-
+    const trans = view.state.update({
+        changes: [{
+                from: 0,
+                to: view.state.doc.length,
+                insert: code
+        }]
+    });
+    view.dispatch(trans);
 }
 
 export function getLineCol(state) {

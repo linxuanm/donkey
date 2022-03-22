@@ -78,13 +78,13 @@ const indentNextLine = ({state, dispatch}) => {
         return {
             changes,
             range: EditorSelection.range(
-                changed.mapPos(range.anchor, 1),
-                changed.mapPos(range.head, 1)
+                range.from + 1 + indents.length,
+                range.from + 1 + indents.length
             )
         };
     });
     
-    dispatch(state.update(updated, {userEvent: "input.indent"}));
+    dispatch(state.update(updated, {userEvent: "input.type"}));
     return true;
 };
 
