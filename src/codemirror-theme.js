@@ -1,16 +1,18 @@
-import { keymap, drawSelection, highlightActiveLine } from "@codemirror/view"
-import { EditorSelection, EditorState } from "@codemirror/state"
-import { history, historyKeymap } from "@codemirror/history"
-import { indentOnInput } from "@codemirror/language"
-import { lineNumbers, highlightActiveLineGutter } from "@codemirror/gutter"
-import { defaultKeymap, indentWithTab } from "@codemirror/commands"
-import { bracketMatching } from "@codemirror/matchbrackets"
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets"
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search"
-import { rectangularSelection } from "@codemirror/rectangular-selection"
-import { defaultHighlightStyle } from "@codemirror/highlight"
-import { EditorView } from "@codemirror/view";
-import { indentUnit, getIndentation, indentService } from "@codemirror/language";
+import { EditorSelection, EditorState } from "@codemirror/state";
+import { history, historyKeymap } from "@codemirror/history";
+import { indentOnInput } from "@codemirror/language";
+import { lineNumbers, highlightActiveLineGutter } from "@codemirror/gutter";
+import { defaultKeymap, indentWithTab } from "@codemirror/commands";
+import { bracketMatching } from "@codemirror/matchbrackets";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { rectangularSelection } from "@codemirror/rectangular-selection";
+import { defaultHighlightStyle } from "@codemirror/highlight";
+import { indentUnit } from "@codemirror/language";
+import {
+    keymap, drawSelection,
+    highlightActiveLine, EditorView
+} from "@codemirror/view";
 
 export const monaco = EditorView.theme({
     "&": {
@@ -58,33 +60,6 @@ export const monaco = EditorView.theme({
     }
 }, {dark: true});
 
-function changeBySelection(state, f) {
-    let curr = -1;
-
-    return state.changeByRange(range => {
-        const changes = [];
-        for (let pos = range.from; pos <= range.to;) {
-            const line = state.doc.lineAt(pos);
-
-            if (line.number > curr && (range.empty || range.to > line.from)) {
-                f(line, changes, range);
-                curr = line.number;
-            }
-
-            pos = line.to + 1;
-        }
-
-        const changed = state.changes(changes);
-        return {
-            changes,
-            range: EditorSelection.range(
-                changed.mapPos(range.anchor, 1),
-                changed.mapPos(range.head, 1)
-            )
-        };
-    });
-}
-
 const indentNextLine = ({state, dispatch}) => {
     if (state.readOnly) return false;
     
@@ -115,26 +90,34 @@ const indentNextLine = ({state, dispatch}) => {
 
 const preserveIndent = {key: "Enter", run: indentNextLine};
 
-export const donkeySetup = [
-    lineNumbers(),
-    highlightActiveLineGutter(),
-    history(),
-    drawSelection(),
-    EditorState.allowMultipleSelections.of(true),
-    indentUnit.of("    "),
-    indentOnInput(),
-    defaultHighlightStyle.fallback,
-    bracketMatching(),
-    closeBrackets(),
-    rectangularSelection(),
-    highlightActiveLine(),
-    highlightSelectionMatches(),
-    keymap.of([
-        preserveIndent,
-        indentWithTab,
-        ...closeBracketsKeymap,
-        ...defaultKeymap,
-        ...searchKeymap,
-        ...historyKeymap
-    ])
-  ];
+export const donkeySetup = (configs) => {
+    const exts = [
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        history(),
+        drawSelection(),
+        EditorState.allowMultipleSelections.of(true),
+        indentUnit.of("    "),
+        indentOnInput(),
+        defaultHighlightStyle.fallback,
+        bracketMatching(),
+        closeBrackets(),
+        rectangularSelection(),
+        highlightActiveLine(),
+        highlightSelectionMatches(),
+        keymap.of([
+            preserveIndent,
+            indentWithTab,
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap
+        ])
+    ];
+
+    if ('onUpdate' in configs) {
+        exts.unshift(EditorView.updateListener.of(configs.onUpdate));
+    }
+
+    return exts;
+};

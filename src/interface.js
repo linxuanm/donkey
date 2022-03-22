@@ -151,36 +151,24 @@ export function print(text, color, raw=false) {
     $('#output-panel').append($('<div>', vals));
 }
 
-function updateLineNo(container, num) {
-    const children = container.children();
-    const diff = num - container.children().length;
-
-    if (diff > 0) {
-        for (var i = 1; i <= diff; i++) {
-            const div = $('<div>', {class: 'line-no font-mono'});
-            const span = $('<span>', {
-                class: 'line-no-inner', text: children.length + i
-            });
-            div.append(span);
-            container.append(div);
-        }
-    } else {
-        for (var i = 1; i <= -diff; i++) {
-            $(children[children.length - i]).remove();
-        }
-    }
-}
-
 function updateStatusText(text) {
     $('#status-text').text(text);
 }
 
-function updateCaretPos(line, col) {
-    $('#caret-pos').text(`Line ${line}, Col ${col}`);
+function updateCaretPos(update) {
+    const ranges = update.state.selection.ranges;
+    if (ranges.length > 1) {
+        $('#caret-pos').text(`${ranges.length} Selections`);
+    } else {
+        const [line, col] = Editor.getLineCol(update.state);
+        $('#caret-pos').text(`Line ${line}, Col ${col}`);
+    }
 }
 
 $(function() {
-    Editor.initEditor();
+    Editor.initEditor({
+        onUpdate: updateCaretPos
+    });
 
     $('#run-code').on('click', () => runCode(false));
     $('#debug-code').on('click', () => runCode(true));
