@@ -91,12 +91,12 @@ const indentNextLine = ({state, dispatch}) => {
     const updated = state.changeByRange(range => {
         const line = state.doc.lineAt(range.from);
         const content = line.text;
-        console.log(content);
+        const indents = content.match(/^ */)[0];
 
         const changes = [{
             from: range.from,
             to: range.to,
-            insert: '\n' + ' '.repeat(1)
+            insert: '\n' + indents
         }];
 
         const changed = state.changes(changes);
