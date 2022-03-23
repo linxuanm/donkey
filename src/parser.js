@@ -11,7 +11,7 @@ const ops = [
     ['or']
 ];
 const keywords = [
-    'if', 'else', 'then', 'do', 'for', 'while', 'until',
+    'if', 'else', 'then', 'for', 'while', 'until',
     'from', 'to', 'loop', 'input', 'output', 'end',
     'div', 'mod', 'true', 'false', 'return', 'break',
     'continue', 'not', 'and', 'or', 'null'

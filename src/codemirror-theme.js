@@ -9,6 +9,8 @@ import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { rectangularSelection } from "@codemirror/rectangular-selection";
 import { defaultHighlightStyle } from "@codemirror/highlight";
 import { indentUnit } from "@codemirror/language";
+import { tags } from "@codemirror/highlight";
+import { StreamLanguage } from "@codemirror/stream-parser";
 import {
     keymap, drawSelection,
     highlightActiveLine, EditorView
@@ -60,6 +62,49 @@ export const monaco = EditorView.theme({
     }
 }, {dark: true});
 
+const langTokens = {
+    name: /[a-zA-Z_][a-zA-Z0-9_]*/
+};
+
+const keywordSets = {
+    controlKeyword: new Set([
+        'if', 'else', 'then', 'for', 'while', 'until',
+        'from', 'to', 'loop', 'return', 'break', 'end'
+    ]),
+    operatorKeyword: new Set([
+        'and', 'or', 'not', 'mod', 'div'
+    ]),
+    keyword: new Set([
+        'input', 'output'
+    ])
+};
+const language = StreamLanguage.define({
+
+    token: (stream, state) => {
+        stream.eatSpace();
+
+        for (let i in langTokens) {
+            const match = stream.match(langTokens[i]);
+            if (match !== null) {
+                const value = match[0];
+
+                if (i === 'name') {
+                    for (let tok in keywordSets) {
+                        if (keywordSets[tok].has(value)) {
+                            return tok;
+                        }
+                    }
+                }
+
+                return i;
+            }
+        }
+
+        stream.next();
+        return '';
+    }
+});
+
 const indentNextLine = ({state, dispatch}) => {
     if (state.readOnly) return false;
     
@@ -88,8 +133,6 @@ const indentNextLine = ({state, dispatch}) => {
     return true;
 };
 
-const preserveIndent = {key: "Enter", run: indentNextLine};
-
 function scrollToView(update) {
     if (update.docChanged || update.selectionSet) {
         const effect = EditorView.scrollIntoView(
@@ -98,12 +141,13 @@ function scrollToView(update) {
         );
         update.view.dispatch(update.state.update({effects: effect}));
     }
-    
+
     return false;
 }
 
 export const donkeySetup = (configs) => {
     const exts = [
+        language,
         lineNumbers(),
         highlightActiveLineGutter(),
         history(),
@@ -119,7 +163,7 @@ export const donkeySetup = (configs) => {
         highlightActiveLine(),
         highlightSelectionMatches(),
         keymap.of([
-            preserveIndent,
+            {key: "Enter", run: indentNextLine},
             indentWithTab,
             ...closeBracketsKeymap,
             ...defaultKeymap,
