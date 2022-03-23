@@ -63,10 +63,11 @@ export const monaco = EditorView.theme({
 }, {dark: true});
 
 const langTokens = {
+    comment: /\/\/.*/,
     name: /[a-zA-Z_][a-zA-Z0-9_]*/,
     number: /[0-9]+(\.[0-9]+)?/,
     string: /(".*?")|('.*?')/,
-    operator: /(==)|(!=)|(>=)|(<=)|>|<|[+\-*/%=!]/,
+    operator: /(==)|(!=)|(>=)|(<=)|>|<|[+\-*%=!]/,
     punctuation: /[.,()\[\]]/
 };
 
@@ -120,7 +121,8 @@ const highlightStyle = HighlightStyle.define([
     {tag: tags.operatorKeyword, color: '#8ADDFF'},
     {tag: tags.string, color: '#DBDDA4'},
     {tag: tags.number, color: '#D081C4'},
-    {tag: tags.name, color: '#8ADDFF'}
+    {tag: tags.name, color: '#8ADDFF'},
+    {tag: tags.comment, color: '#8A8A8A'}
 ]);
 
 const indentNextLine = ({state, dispatch}) => {
