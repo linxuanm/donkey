@@ -9,7 +9,7 @@ import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { rectangularSelection } from "@codemirror/rectangular-selection";
 import { defaultHighlightStyle } from "@codemirror/highlight";
 import { indentUnit } from "@codemirror/language";
-import { tags } from "@codemirror/highlight";
+import { HighlightStyle, tags } from "@codemirror/highlight";
 import { StreamLanguage } from "@codemirror/stream-parser";
 import {
     keymap, drawSelection,
@@ -73,7 +73,7 @@ const langTokens = {
 const keywordSets = {
     controlKeyword: new Set([
         'if', 'else', 'then', 'for', 'while', 'until',
-        'from', 'to', 'loop', 'end'
+        'loop', 'end', 'from', 'to'
     ]),
     operatorKeyword: new Set([
         'and', 'or', 'not', 'mod', 'div'
@@ -84,6 +84,7 @@ const keywordSets = {
     null: new Set(['null']),
     bool: new Set(['true', 'false'])
 };
+
 const language = StreamLanguage.define({
 
     token: (stream, state) => {
@@ -110,6 +111,17 @@ const language = StreamLanguage.define({
         return '';
     }
 });
+
+const highlightStyle = HighlightStyle.define([
+    {tag: tags.controlKeyword, color: '#00C0FF'},
+    {tag: tags.keyword, color: '#00CDAF'},
+    {tag: tags.null, color: '#DBDDA4'},
+    {tag: tags.bool, color: '#DBDDA4'},
+    {tag: tags.operatorKeyword, color: '#8ADDFF'},
+    {tag: tags.string, color: '#DBDDA4'},
+    {tag: tags.number, color: '#D081C4'},
+    {tag: tags.name, color: '#8ADDFF'}
+]);
 
 const indentNextLine = ({state, dispatch}) => {
     if (state.readOnly) return false;
@@ -154,6 +166,7 @@ function scrollToView(update) {
 export const donkeySetup = (configs) => {
     const exts = [
         language,
+        highlightStyle.extension,
         lineNumbers(),
         highlightActiveLineGutter(),
         history(),
