@@ -90,6 +90,18 @@ const indentNextLine = ({state, dispatch}) => {
 
 const preserveIndent = {key: "Enter", run: indentNextLine};
 
+function scrollToView(update) {
+    if (update.docChanged || update.selectionSet) {
+        const effect = EditorView.scrollIntoView(
+            update.state.selection.main,
+            {y: "center"}
+        );
+        update.view.dispatch(update.state.update({effects: effect}));
+    }
+    
+    return false;
+}
+
 export const donkeySetup = (configs) => {
     const exts = [
         lineNumbers(),
@@ -99,6 +111,7 @@ export const donkeySetup = (configs) => {
         EditorState.allowMultipleSelections.of(true),
         indentUnit.of("    "),
         indentOnInput(),
+        EditorView.updateListener.of(scrollToView),
         defaultHighlightStyle.fallback,
         bracketMatching(),
         closeBrackets(),
