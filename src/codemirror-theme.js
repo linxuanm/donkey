@@ -63,20 +63,26 @@ export const monaco = EditorView.theme({
 }, {dark: true});
 
 const langTokens = {
-    name: /[a-zA-Z_][a-zA-Z0-9_]*/
+    name: /[a-zA-Z_][a-zA-Z0-9_]*/,
+    number: /[0-9]+(\.[0-9]+)?/,
+    string: /(".*?")|('.*?')/,
+    operator: /(==)|(!=)|(>=)|(<=)|>|<|[+\-*/%=!]/,
+    punctuation: /[.,()\[\]]/
 };
 
 const keywordSets = {
     controlKeyword: new Set([
         'if', 'else', 'then', 'for', 'while', 'until',
-        'from', 'to', 'loop', 'return', 'break', 'end'
+        'from', 'to', 'loop', 'end'
     ]),
     operatorKeyword: new Set([
         'and', 'or', 'not', 'mod', 'div'
     ]),
     keyword: new Set([
-        'input', 'output'
-    ])
+        'input', 'output', 'return', 'break', 'continue'
+    ]),
+    null: new Set(['null']),
+    bool: new Set(['true', 'false'])
 };
 const language = StreamLanguage.define({
 
