@@ -118,7 +118,7 @@ const highlightStyle = HighlightStyle.define([
     {tag: tags.keyword, color: '#00CDAF'},
     {tag: tags.null, color: '#DBDDA4'},
     {tag: tags.bool, color: '#DBDDA4'},
-    {tag: tags.operatorKeyword, color: '#8ADDFF'},
+    {tag: tags.operatorKeyword, color: '#D081C4'},
     {tag: tags.string, color: '#DBDDA4'},
     {tag: tags.number, color: '#D081C4'},
     {tag: tags.name, color: '#8ADDFF'},

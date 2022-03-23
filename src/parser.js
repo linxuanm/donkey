@@ -58,13 +58,9 @@ export class Node {
     }
 }
 
-export class Exp extends Node {
-    // TODO: the stack top codegen thingy
-}
+export class Exp extends Node {}
 
-export class Stmt extends Node {
-    // TODO: the code emit thingy
-}
+export class Stmt extends Node {}
 
 export class LHS {
 

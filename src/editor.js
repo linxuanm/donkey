@@ -11,7 +11,9 @@ export function initEditor(configs) {
 }
 
 export function getEditorContent() {
-    return view.state.doc.text.join('\n');
+    const lines = [];
+    view.state.doc.flatten(lines);
+    return lines.join('\n');
 }
 
 export function setEditorContent(code) {
