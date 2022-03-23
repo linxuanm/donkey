@@ -54,8 +54,8 @@ function parseAndRun(code, debugMode=false) {
     }
 
     const handles = {
-        print(msg, color='#D4D4D4') {
-            print(msg, color);
+        print(msg, color='#D4D4D4', raw=false) {
+            print(msg, color, raw);
         },
         error(msgs) {
             printError(msgs);

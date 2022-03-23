@@ -362,7 +362,7 @@ export const NATIVE_FUNCS = {
     '$input': new Runtime.NativeFunction([], (vm, exp) => {
         const res = prompt('Input: ');
         const msg = `<strong>Input:</strong> <i>'${res}'</i>`;
-        outputPrint(msg, '#8ADDFF', false, true);
+        vm.handles.print(msg, '#8ADDFF', true);
         vm.push(Runtime.STR(res));
     })
 };
