@@ -34,9 +34,7 @@ export const UN_OP = {
 
 export const METHODS = {
     'List': {
-        '$setIndex': new Runtime.NativeFunction(
-            ['lst', 'idx', 'exp'],
-            (vm, exp) => {
+        '$setIndex': new Runtime.NativeFunction(['lst', 'idx', 'exp'], (vm, exp) => {
                 exp[1].assertType(
                     'integer',
                     `Index must be of type integer, but got '${exp[1].type}'`
@@ -53,15 +51,50 @@ export const METHODS = {
 
                 lst[idx] = exp[2];
                 vm.push(Runtime.NULL());
-            }
-        ),
+        }),
         'length': new Runtime.NativeFunction(['lst'], (vm, exp) => {
             vm.push(Runtime.INT(exp[0].value.length));
         }),
         'add': new Runtime.NativeFunction(['lst', 'val'], (vm, exp) => {
             exp[0].value.push(exp[1]);
             vm.push(Runtime.NULL());
-        })
+        }),
+        'remove': new Runtime.NativeFunction(['lst', 'idx'], (vm, exp) => {
+            exp[1].assertType(
+                'integer',
+                `Index must be of type integer, but got '${exp[1].type}'`
+            );
+            const lst = exp[0].value;
+            const idx = exp[1].value;
+            if (idx >= lst.length || idx < 0) {
+                throw new Runtime.VMError(
+                    'Index Error',
+                    `Removing index ${idx} of list with \
+                    length ${lst.length}`
+                );
+            }
+
+            lst.splice(idx, 1);
+            vm.push(Runtime.NULL());
+        }),
+        'insert': new Runtime.NativeFunction(['lst', 'idx', 'exp'], (vm, exp) => {
+            exp[1].assertType(
+                'integer',
+                `Index must be of type integer, but got '${exp[1].type}'`
+            );
+            const lst = exp[0].value;
+            const idx = exp[1].value;
+            if (idx >= lst.length || idx < 0) {
+                throw new Runtime.VMError(
+                    'Index Error',
+                    `Inserting at index ${idx} of list with \
+                    length ${lst.length}`
+                );
+            }
+
+            lst.splice(idx, 0, exp[2]);
+            vm.push(Runtime.NULL());
+    })
     },
     'Queue': {
         'enqueue': new Runtime.NativeFunction(['lst', 'val'], (vm, exp) => {
