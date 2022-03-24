@@ -324,7 +324,7 @@ export const NATIVE_FUNCS = {
         } else {
             throw new Runtime.VMError(
                 `Type Error`,
-                `'int()' cannot be used on type ${exp[0].type}`
+                `'int()' cannot be used on type '${exp[0].type}'`
             );
         }
     }),
@@ -346,7 +346,7 @@ export const NATIVE_FUNCS = {
         } else {
             throw new Runtime.VMError(
                 'Type Error',
-                `'real()' cannot be used on type ${exp[0].type}`
+                `'real()' cannot be used on type '${exp[0].type}'`
             );
         }
     }),

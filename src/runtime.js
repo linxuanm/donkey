@@ -57,7 +57,7 @@ export class DonkeyObject {
     bool() {
         this.assertType(
             'boolean',
-            `Type ${this.type} cannot be interpreted as a boolean`
+            `Type '${this.type}' cannot be interpreted as a boolean`
         );
         return this.value;
     }

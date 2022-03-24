@@ -3,12 +3,22 @@ import P from 'parsimmon';
 import * as Runtime from './runtime';
 import * as Code from './opcode';
 
+const _ = P.regexp(/( |\t)*/);
+const __ = P.regexp(/( |\t)+/);
+
+const oneOfStr = arr => P.alt(...arr.map(e => P.string(e))).desc(arr);
+const mulLevel = P.alt(
+    oneOfStr(['*', '/', '%']),
+    oneOfStr(['div', 'mod']).wrap(__, __)
+);
 const ops = [
-    ['*', 'div', 'mod', '/', '%'],
-    ['+', '-'],
-    ['==', '!=', '>=', '<=', '>', '<'],
-    ['and'],
-    ['or']
+    {type: 'unary', ops: oneOfStr(['-', '!']).skip(_)},
+    {type: 'binary', ops: mulLevel},
+    {type: 'binary', ops: oneOfStr(['+', '-']).trim(_)},
+    {type: 'binary', ops: oneOfStr(['==', '!=', '>=', '<=', '>', '<']).trim(_)},
+    {type: 'unary', ops: P.string('not').skip(__)},
+    {type: 'binary', ops: P.string('and').wrap(__, __)},
+    {type: 'binary', ops: P.string('or').wrap(__, __)}
 ];
 const keywords = [
     'if', 'else', 'then', 'for', 'while', 'until',
@@ -16,9 +26,6 @@ const keywords = [
     'div', 'mod', 'true', 'false', 'return', 'break',
     'continue', 'not', 'and', 'or', 'null'
 ];
-
-const _ = P.regexp(/( |\t)*/);
-const __ = P.regexp(/( |\t)+/);;
 
 const alphaNum = P.regexp(/[a-zA-Z][a-zA-Z0-9_]*/);
 const iden = alphaNum.assert(
@@ -509,23 +516,9 @@ function parens(p, a, b) {
     return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
 }
 
-function makeUniExp(op, parser) {
-    return P.seqMap(
-        op.skip(_).mark(),
-        parser,
-        (node, e) => new UniExp(node.start, node.value, e)
-    );
-}
-
-function oneOfStr(arr) {
-    return P.alt(...arr.map(e => P.string(e))).desc(arr);
-}
-
-function chainOp(ops, parser) {
+function chainBinOp(ops, parser) {
     const further = P.seqObj(
-        _,
-        ['op', oneOfStr(ops).mark()],
-        _,
+        ['op', ops.mark()],
         ['exp', parser]
     );
 
@@ -536,9 +529,28 @@ function chainOp(ops, parser) {
     });
 }
 
+function chainUniOp(op, parser) {
+    const partial = P.lazy(() => P.alt(
+        P.seqMap(
+            op.mark(),
+            partial,
+            (node, e) => new UniExp(node.start, node.value, e)
+        ),
+        parser
+    ));
+
+    return partial;
+}
+
 function opParser(precOps, parser) {
     for (var i of precOps) {
-        parser = chainOp(i, parser);
+        if (i.type === 'binary') {
+            parser = chainBinOp(i.ops, parser);
+        } else if (i.type === 'unary') {
+            parser = chainUniOp(i.ops, parser);
+        } else {
+            throw 'not implemented';
+        }
     }
 
     return parser;
@@ -576,7 +588,7 @@ export const lang = P.createLanguage({
         });
     },
     Exp: r => {
-        return opParser(ops, r.UniExp);
+        return opParser(ops, r.CompExp);
     },
     ExpSuffix: r => {
         const idxParser = _.then(parens(r.Exp, "[", "]").mark().map(e => {
@@ -596,14 +608,6 @@ export const lang = P.createLanguage({
         return P.sepBy(P.alt(
             idxParser, invokeParser
         ), _);
-    },
-    UniExp: r => {
-        return P.alt(
-            makeUniExp(P.string('not').skip(__),  r.UniExp),
-            makeUniExp(P.string('-'), r.UniExp),
-            makeUniExp(P.string('!'), r.UniExp),
-            r.CompExp
-        );
     },
     CompExp: r => {
         return P.seqMap(
