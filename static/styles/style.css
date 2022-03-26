@@ -5,6 +5,14 @@
     box-sizing: border-box;
 }
 
+::-webkit-scrollbar {
+    background-color: #2A2A2A;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #3C3C3C;
+}
+
 html, body {
     margin: 0;
     height: 100vh;
