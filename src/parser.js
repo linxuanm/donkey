@@ -8,7 +8,7 @@ const __ = P.regexp(/( |\t)+/);
 
 const oneOfStr = arr => P.alt(...arr.map(e => P.string(e))).desc(arr);
 const mulLevel = P.alt(
-    oneOfStr(['*', '/', '%']),
+    oneOfStr(['*', '/', '%']).trim(_),
     oneOfStr(['div', 'mod']).wrap(__, __)
 );
 const ops = [
