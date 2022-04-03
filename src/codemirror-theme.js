@@ -176,7 +176,7 @@ export const donkeySetup = (configs) => {
         EditorState.allowMultipleSelections.of(true),
         indentUnit.of("    "),
         indentOnInput(),
-        EditorView.updateListener.of(scrollToView),
+        // EditorView.updateListener.of(scrollToView),
         defaultHighlightStyle.fallback,
         bracketMatching(),
         closeBrackets(),
