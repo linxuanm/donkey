@@ -68,7 +68,8 @@ const langTokens = {
     number: /[0-9]+(\.[0-9]+)?/,
     string: /(".*?")|('.*?')/,
     operator: /(==)|(!=)|(>=)|(<=)|>|<|[+\-*%=!]/,
-    punctuation: /[.,()\[\]]/
+    punctuation: /[.,()\[\]]/,
+    annotation: /;;/
 };
 
 const keywordSets = {
@@ -122,7 +123,8 @@ const highlightStyle = HighlightStyle.define([
     {tag: tags.string, color: '#DBDDA4'},
     {tag: tags.number, color: '#D081C4'},
     {tag: tags.name, color: '#8ADDFF'},
-    {tag: tags.comment, color: '#8A8A8A'}
+    {tag: tags.comment, color: '#8A8A8A'},
+    {tag: tags.annotation, color: '#FF3843'}
 ]);
 
 const indentNextLine = ({state, dispatch}) => {
