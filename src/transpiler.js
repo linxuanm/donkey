@@ -3,9 +3,10 @@ import * as Prelude from './prelude';
 
 class CodeGenContext {
 
-    constructor() {
+    constructor(debugMode) {
         this.stack = []; // scope stack
         this.code = [];
+        this.debug = debugMode;
     }
 
     push(scope) {
@@ -17,7 +18,7 @@ class CodeGenContext {
     }
 };
 
-export function transpile(code) {
+export function transpile(code, debugMode) {
     const funcs = [];
     const funcNames = new Set();
     const mainStmts = [];
@@ -54,7 +55,7 @@ export function transpile(code) {
 
     // console.log(funcs);
     const packaged = funcs.map(e => {
-        const context = new CodeGenContext();
+        const context = new CodeGenContext(debugMode);
         e.codeGen(context);
         
         return {

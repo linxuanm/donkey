@@ -40,7 +40,7 @@ function parseAndRun(code, debugMode=false) {
 
     let funcs;
     try {
-        funcs = transpile(result.value);
+        funcs = transpile(result.value, debugMode);
     } catch (error) {
         if (Array.isArray(error)) {
             printError(error);
@@ -96,13 +96,15 @@ export function printError(errs, headerFirst=true) {
 }
 
 function showError(text, header=true) {
+    const red = '#FF3843';
+
     if (header) {
         const roast = 'Your program failed, just like your life';
-        printBold(roast, '#FF3843');
-        printBold('='.repeat(20), '#FF3843');
+        printBold(roast, red);
+        printBold('='.repeat(20), red);
     }
 
-    printBold(text, '#FF3843');
+    printBold(text, red);
 }
 
 function saveCode() {

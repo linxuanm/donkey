@@ -448,6 +448,19 @@ export class FuncCallStmt extends Stmt {
     }
 }
 
+export class BreakPointStmt extends Stmt {
+
+    constructor(line) {
+        super(line);
+    }
+
+    codeGen(context) {
+        if (context.debug) {
+            context.code.push(new Code.CodeBreakPoint(this.line));
+        }
+    }
+}
+
 export class IdenLHS extends LHS {
 
     constructor(name) {
@@ -672,6 +685,7 @@ export const lang = P.createLanguage({
     },
     Stmt: r => {
         return P.alt(
+            r.BPStmt,
             r.OutStmt,
             r.InStmt,
             r.CtrlStmt,
@@ -681,6 +695,9 @@ export const lang = P.createLanguage({
             r.AsnStmt,
             r.CallStmt
         );
+    },
+    BPStmt: r => {
+        return P.string(';;').mark().map(e => new BreakPointStmt(e.start));
     },
     CallStmt: r => {
         return r.Exp.assert(

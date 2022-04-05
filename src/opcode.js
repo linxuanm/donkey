@@ -25,6 +25,17 @@ export class OpCode {
     }
 }
 
+export class CodeBreakPoint extends OpCode {
+
+    constructor(line) {
+        super(line);
+    }
+
+    execute(vm, frame) {
+        
+    }
+}
+
 export class CodeJump extends OpCode {
 
     constructor(line, target) {
