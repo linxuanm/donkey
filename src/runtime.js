@@ -119,9 +119,18 @@ class FunctionFrame {
         this.pc = 0;
         this.locals = {};
         this.code = code; // cuz im lazy yaaaaaaaaay
+
+        /*
+            Stores the pc that was just executed, as certain
+            operations change the value of pc, and if an error
+            was thrown after that, the VM needs a pointer to the
+            responsible instruction.
+        */
+        this.prevPc = 0;
     }
 
     execute(runtime) {
+        this.prevPc = this.pc;
         const op = this.code[this.pc];
         this.pc++;
         op.execute(runtime, this);
@@ -204,13 +213,9 @@ export class VMError {
 
     formatMsg(vm) {
         const currFrame = vm.currFrame();
-        /*
-            ptr - 1 to get the innstruction that was just executed as the
-            ptr is incremented before executing an instruction
-        */
-        const prevIdx = currFrame.pc - 1;
+        const prev = currFrame.prevPc;
         return [
-            `${this.type}: Line ${currFrame.code[prevIdx].line.line}`,
+            `${this.type}: Line ${currFrame.code[prev].line.line}`,
             this.msg
         ];
     }

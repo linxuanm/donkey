@@ -3,13 +3,15 @@ import P from 'parsimmon';
 import * as Runtime from './runtime';
 import * as Code from './opcode';
 
+const comment = P.string('//').then(P.regexp(/[^\n]*/));
 const _ = P.regexp(/( |\t)*/);
 const __ = P.regexp(/( |\t)+/);
+const optWhite = P.alt(P.whitespace, comment).many();
 
 const oneOfStr = arr => P.alt(...arr.map(e => P.string(e))).desc(arr);
 const mulLevel = P.alt(
     oneOfStr(['*', '/', '%']).trim(_),
-    oneOfStr(['div', 'mod']).wrap(__, __)
+    oneOfStr(['div', 'mod']).trim(__)
 );
 const ops = [
     {type: 'unary', ops: oneOfStr(['-', '!']).skip(_)},
@@ -17,8 +19,8 @@ const ops = [
     {type: 'binary', ops: oneOfStr(['+', '-']).trim(_)},
     {type: 'binary', ops: oneOfStr(['==', '!=', '>=', '<=', '>', '<']).trim(_)},
     {type: 'unary', ops: P.string('not').skip(__)},
-    {type: 'binary', ops: P.string('and').wrap(__, __)},
-    {type: 'binary', ops: P.string('or').wrap(__, __)}
+    {type: 'binary', ops: P.string('and').trim(__)},
+    {type: 'binary', ops: P.string('or').trim(__)}
 ];
 const keywords = [
     'if', 'else', 'then', 'for', 'while', 'until',
@@ -46,7 +48,7 @@ const strLit = P.alt(
     P.regexp(/".*?"/),
     P.regexp(/'.*?'/)
 ).map(s => s.slice(1, -1));
-const bool = P.regexp(/true|false/).map(e => e == 'true');
+const bool = P.regexp(/true|false/).map(e => e === 'true');
 
 /*
     Normally I don't think its good js pattern to enforce abstract
@@ -513,7 +515,7 @@ export function dummyLine() {
 }
 
 function parens(p, a, b) {
-    return p.trim(P.optWhitespace).wrap(P.string(a), P.string(b));
+    return p.trim(optWhite).wrap(P.string(a), P.string(b));
 }
 
 function chainBinOp(ops, parser) {
@@ -624,7 +626,7 @@ export const lang = P.createLanguage({
         );
     },
     ListExp: r => {
-        return r.Exp.sepBy(P.string(",").trim(P.optWhitespace));
+        return r.Exp.sepBy(P.string(",").trim(optWhite));
     },
     ListExpCont: r => {
         return r.Exp.sepBy(P.string(",").trim(_));
@@ -653,7 +655,7 @@ export const lang = P.createLanguage({
             ['name', iden.mark()],
             _,
             ['params', parens(
-                iden.sepBy(P.string(',').trim(P.optWhitespace)),
+                iden.sepBy(P.string(',').trim(optWhite)),
                 '(', ')'
             )],
             ['stmts', r.LineDiv.then(r.Stmt).many()]
@@ -828,11 +830,11 @@ export const lang = P.createLanguage({
         ).map(e => new ForStmt(e.line.start, e.iter, e.from, e.to, e.stmts));
     },
     Global: r => {
-        return P.optWhitespace.then(
-            P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(P.optWhitespace)
+        return optWhite.then(
+            P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(optWhite)
         );
     },
     LineDiv: r => {
-        return _.then(P.newline).skip(P.optWhitespace);
+        return _.then(comment.atMost(1)).then(P.newline).skip(optWhite);
     }
 });

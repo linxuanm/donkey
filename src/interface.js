@@ -28,6 +28,7 @@ function parseAndRun(code, debugMode=false) {
         let line = result.index.line;
         if (result.index.column === 0) line--;
         showError(`Syntax Error: Line ${line}`);
+        console.log(result);
 
         printError(
             result.expected.filter(s => s.startsWith('$')).map(s => s.substring(1)),
