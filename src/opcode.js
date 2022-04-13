@@ -32,7 +32,7 @@ export class CodeBreakPoint extends OpCode {
     }
 
     execute(vm, frame) {
-        
+        vm.pause();
     }
 }
 

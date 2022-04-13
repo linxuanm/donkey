@@ -145,11 +145,30 @@ export class DonkeyRuntime {
         this.mainEnv = {};
         this.debugMode = debugMode;
         this.handles = handles;
+        this.paused = false; // halts at breakpoint
 
         this.funcs = {};
         for (var i of funcs) {
             this.funcs[i.name] = new CodeFunction(i.params, i.code);
         }
+    }
+
+    pause() {
+        if (!this.debugMode) {
+            console.log('Error: breakpoint in non-debug mode');
+            return;
+        }
+
+        this.paused = true;
+    }
+
+    resume() {
+        if (!this.paused) {
+            console.log('Error: resuming an non-paused execution');
+            return;
+        }
+        
+        this.paused = false;
     }
 
     runMain(main='$main') {
