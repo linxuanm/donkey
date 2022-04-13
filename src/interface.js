@@ -65,16 +65,27 @@ function parseAndRun(code, debugMode=false) {
         exit() {
             printBold('Program End', '#00CDAF');
             terminate();
+        },
+        handlePause() {
+            $('#next-code').removeClass('disabled-div');
+        },
+        handleResume() {
+            $('#next-code').addClass('disabled-div');
         }
     };
 
-    const runtime = new Runtime.DonkeyRuntime(funcs, debugMode, handles);
-    runtime.runMain();
+    if (global.currVM !== null) {
+        console.log('Another runtime is running!');
+        return;
+    }
+
+    global.currVM = new Runtime.DonkeyRuntime(funcs, debugMode, handles);
+    global.currVM.runMain();
 }
 
 function terminate() {
     if (global.currVM !== null) {
-        clearInterval(global.currVM);
+        global.currVM.cleanUp();
         global.currVM = null;
     } else {
         console.log('Emitting stop signal but there is no active runtime');
@@ -175,6 +186,9 @@ $(function() {
 
     $('#run-code').on('click', () => runCode(false));
     $('#debug-code').on('click', () => runCode(true));
+    $('#next-code').on('click', () => {
+        global.currVM.resume();
+    });
     $('#stop-code').on('click', () => {
         showError('Program Aborted', false);
         terminate();

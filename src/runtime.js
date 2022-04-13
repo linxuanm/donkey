@@ -159,6 +159,7 @@ export class DonkeyRuntime {
             return;
         }
 
+        this.handles.handlePause();
         this.paused = true;
     }
 
@@ -167,23 +168,24 @@ export class DonkeyRuntime {
             console.log('Error: resuming an non-paused execution');
             return;
         }
-        
+
+        this.handles.handleResume();
         this.paused = false;
     }
 
     runMain(main='$main') {
-        if (global.currVM !== null) {
-            console.log('Another runtime is running!');
-            return;
-        }
-
         const frame = new FunctionFrame(this.funcs[main].code);
         this.mainEnv = frame.locals;
 
         this.funcFrames.push(frame);
 
-        global.currVM = setInterval(() => {
+        this.updateInterval = setInterval(() => {
+
             for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
+
+                // breakpoint
+                if (this.paused) return;
+
                 try {
                     this.currFrame().execute(this);
                 } catch (error) {
@@ -220,6 +222,11 @@ export class DonkeyRuntime {
         }
 
         return this.stack.pop().copy();
+    }
+
+    // Do some clean up before exiting.
+    cleanUp() {
+        clearInterval(this.updateInterval);
     }
 }
 

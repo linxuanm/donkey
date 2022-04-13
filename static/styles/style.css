@@ -121,6 +121,11 @@ textarea {
     border-left: 2px solid #FF3843;
 }
 
+.disabled-div {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
 .action-icon {
     height: 35px;
 }
