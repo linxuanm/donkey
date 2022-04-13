@@ -178,7 +178,6 @@ export class DonkeyRuntime {
         this.mainEnv = frame.locals;
 
         this.funcFrames.push(frame);
-
         this.updateInterval = setInterval(() => {
 
             for (var i = 0; i < EXE_FREQ && this.funcFrames.length > 0; i++) {
