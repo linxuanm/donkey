@@ -92,6 +92,8 @@ function parseAndRun(code, debugMode=false) {
                 for (var name in varData.local) {
                     debugObject(name, varData.local[name]);
                 }
+                
+                $('#debugger-panel').append($('<br>'));
             }
 
             debugTitle('Global:');

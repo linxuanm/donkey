@@ -452,12 +452,11 @@ export class BreakPointStmt extends Stmt {
 
     constructor(line) {
         super(line);
+        this.irCount = 1;
     }
 
     codeGen(context) {
-        if (context.debug) {
-            context.code.push(new Code.CodeBreakPoint(this.line));
-        }
+        context.code.push(new Code.CodeBreakPoint(this.line));
     }
 }
 
