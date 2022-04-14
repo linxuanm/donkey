@@ -270,7 +270,7 @@ export const BIN_OP = {
 BIN_OP['div'] = BIN_OP['/'];
 BIN_OP['mod'] = BIN_OP['%'];
 
-function repr(exp) {
+export function repr(exp) {
     if (exp.type === 'string') return `"${exp.value}"`;
     return toString(exp)
 }

@@ -153,13 +153,13 @@ export class DonkeyRuntime {
         }
     }
 
-    pause() {
+    pause(line) {
         if (!this.debugMode) {
-            console.log('Error: breakpoint in non-debug mode');
+            console.log(`Error: line ${line} breakpoint in non-debug mode`);
             return;
         }
 
-        this.handles.handlePause();
+        this.handles.handlePause(line);
         this.paused = true;
     }
 
@@ -226,6 +226,20 @@ export class DonkeyRuntime {
     // Do some clean up before exiting.
     cleanUp() {
         clearInterval(this.updateInterval);
+    }
+
+    /*
+        Used in debug mode. Gets all locally and globally defined
+        variables.
+    */
+    getVariablesData() {
+        const local = this.currFrame();
+        const glob = this.funcFrames[0];
+        if (local === glob) { // curr frame is $main
+            return { 'global': glob.locals };
+        }
+
+        return { 'global': glob.locals, 'local': local.locals };
     }
 }
 

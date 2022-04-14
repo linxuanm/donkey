@@ -84,6 +84,10 @@ textarea {
     padding: 15px;
 }
 
+.debug-title {
+    color: #00CDAF;
+}
+
 .full-h-panel {
     min-width: 100%;
     max-width: 0;

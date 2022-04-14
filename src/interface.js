@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Cookies from 'js.cookie';
 
 import { lang } from './parser';
+import { repr } from './prelude';
 import { transpile } from './transpiler';
 import * as Runtime from './runtime';
 import * as Editor from './editor';
@@ -66,10 +67,34 @@ function parseAndRun(code, debugMode=false) {
             printBold('Program End', '#00CDAF');
             terminate();
         },
-        handlePause() {
+        handlePause(line) {
             $('#next-code').removeClass('disabled-div');
+            const varData = global.currVM.getVariablesData();
+
+            const debugTitle = text => {
+                const vals = {
+                    class: 'output-base debug-title',
+                };
+                vals['html'] = `<strong>${text}</strong>`;
+                $('#debugger-panel').append($('<div>', vals));
+            };
+
+            $('#debugger-panel').empty();
+
+            if ('local' in varData) {
+                debugTitle('Local:');
+                for (var name in varData.local) {
+                    debugObject(name, varData.local[name]);
+                }
+            }
+
+            debugTitle('Global:');
+            for (var name in varData.global) {
+                debugObject(name, varData.global[name]);
+            }
         },
         handleResume() {
+            $('#debugger-panel').empty();
             $('#next-code').addClass('disabled-div');
         }
     };
@@ -163,6 +188,37 @@ export function print(text, color, raw=false) {
     };
     vals[raw ? 'html' : 'text'] = text;
     $('#output-panel').append($('<div>', vals));
+}
+
+// color for a type repr
+function colorType(typeName) {
+    let color;
+    switch (typeName) {
+        case 'integer':
+        case 'real':
+            color = '#D081C4';
+            break;
+        case 'string':
+            color = '#DBDDA4';
+            break;
+        case 'boolean':
+            color = '#DBDDA4';
+            break;
+        default:
+            color = '#8ADDFF';
+    }
+
+    return `(<span style="color:${color}">${typeName}</span>)`;
+}
+
+function debugObject(varName, dObject) {
+    const vals = { class: 'output-base code-font' };
+
+    const objType = colorType(dObject.type);
+    const valRepr = repr(dObject);
+
+    vals['html'] = `${objType} ${varName} = ${valRepr}`;
+    $('#debugger-panel').append($('<div>', vals));
 }
 
 function updateStatusText(text) {
