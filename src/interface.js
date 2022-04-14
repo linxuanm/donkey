@@ -17,6 +17,7 @@ function runCode(debugMode = false) {
     $(`.${debugMode ? 'debug' : 'run'}-action`).show();
 
     $('#output-panel').empty();
+    $('#debugger-panel').empty();
     printBold(`${debugMode ? 'Debugger' : 'Program'} Start`, '#00CDAF');
 
     parseAndRun(Editor.getEditorContent(), debugMode);
@@ -71,16 +72,21 @@ function parseAndRun(code, debugMode=false) {
             $('#next-code').removeClass('disabled-div');
             const varData = global.currVM.getVariablesData();
 
-            const debugTitle = text => {
+            const debugTitle = (text, color) => {
                 const vals = {
                     class: 'output-base debug-title',
                 };
+
+                if (color !== undefined) {
+                    vals.style = `color:${color}`;
+                }
+
                 vals['html'] = `<strong>${text}</strong>`;
                 $('#debugger-panel').append($('<div>', vals));
             };
 
             $('#debugger-panel').empty();
-
+            debugTitle(`Breakpoint at line ${line.line}`, '#FF3843');
             if ('local' in varData) {
                 debugTitle('Local:');
                 for (var name in varData.local) {
@@ -94,7 +100,6 @@ function parseAndRun(code, debugMode=false) {
             }
         },
         handleResume() {
-            $('#debugger-panel').empty();
             $('#next-code').addClass('disabled-div');
         }
     };
