@@ -20,6 +20,15 @@ function runCode(debugMode = false) {
     $('#debugger-panel').empty();
     printBold(`${debugMode ? 'Debugger' : 'Program'} Start`, '#00CDAF');
 
+    if (debugMode) {
+        /*
+            If a termination signal is received after a breakpoint hit,
+            the interface will actually not disable the continue button,
+            so here's a manual solution.
+        */
+        $('#next-code').addClass('disabled-div');
+    }
+
     parseAndRun(Editor.getEditorContent(), debugMode);
 }
 
