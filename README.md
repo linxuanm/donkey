@@ -9,3 +9,7 @@ Donkey IDE is an online IDE and debugger for IB Pseudocode. Check it out [here](
 ## Writing Pseudocode
 
 Donkey IDE targets IB Pseudocode grammar. The details are described [in this documentation](https://donkey.readthedocs.io/).
+
+## but david the gui looks familiar
+
+yea it uses the color scheme of vs code cuz i can't design lol
