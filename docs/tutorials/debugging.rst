@@ -27,7 +27,7 @@ Just like any other statements, a break point has to be placed in a separate lin
         ;;
     end loop
 
-The above code, when ran in debug mode, will pause 5 times.
+The above code will pause 5 times when ran in debug mode.
 
 Debugger Information
 -----------------------
