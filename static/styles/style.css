@@ -138,6 +138,7 @@ textarea {
     filter: invert(83%);
     transition: 0.2s;
     height: 30px;
+    cursor: pointer;
 }
 
 .icon-menu:hover {
