@@ -7,7 +7,7 @@ This section covers the debugger feature of Donkey.
 
 The debugger (section 3 in the image below) is a tool to help you debug by providing a way to trace through your code.
 
-.. image:: images/ui_demo.png
+.. image:: ../images/ui_demo.png
    :width: 600
 
 The debugger is usually inactive unless Donkey is ran in debug mode (by pressing the "bug" icon instead of the "play" bytton). Once a program is ran in debug mode, it will pause on every break point, and display some relevant information in the debugger window.
