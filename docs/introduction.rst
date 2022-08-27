@@ -7,7 +7,7 @@ The current version can be accessed `here <http://donkey.davidma.cn>`_.
 
 .. note::
 
-    The IB CS board is notorious for making mistakes in official resources and exam papers. This unfortunately resulted in contradictory code behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a stricter subset of the IB Pseudocode syntax while retaining all the functionalities.
+    Unfortunately, the IB CS board commonly make mistakes in official resources and exam papers. This resulted in contradictory code behavior specifications and ambiguous syntax in their pseudocode standard. To eliminate those problems, Donkey IDE incorporates a stricter subset of the IB Pseudocode syntax while retaining all the functionalities.
 
 User Interface
 --------------

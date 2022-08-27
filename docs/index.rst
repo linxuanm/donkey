@@ -20,3 +20,4 @@ Donkey Pseudocode Documentation
     Compound Data Types <tutorials/complex>
     Functions <tutorials/functions>
     Debugging <tutorials/debugging>
+    Examples <tutorials/examples>
