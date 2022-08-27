@@ -134,6 +134,16 @@ textarea {
     height: 35px;
 }
 
+.icon-menu {
+    filter: invert(83%);
+    transition: 0.2s;
+    height: 30px;
+}
+
+.icon-menu:hover {
+    filter: invert(100%);
+}
+
 .icon-blue {
     filter: invert(30%) sepia(80%) saturate(2826%) hue-rotate(188deg)
             brightness(91%) contrast(101%);
@@ -156,6 +166,12 @@ textarea {
 
 .title-bar-item {
     margin: 0 50px 0 50px;
+}
+
+.title-flex {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
 }
 
 .ide-name {

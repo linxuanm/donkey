@@ -36,7 +36,7 @@ An :code:`else` component can be added to an :code:`if` statement. The contained
         <else_statements>
     end if
 
-Note that :code:`if` can be nested inside :code:`else`. This is just a syntax sugar that makes mimicing a switch statement easier. For example, the below code::
+Note that :code:`if` can be nested inside :code:`else`. This is just a syntax sugar that makes mimicking a switch statement easier. For example, the below code::
 
     if X > 10 then
         output "X is greater than 10"
