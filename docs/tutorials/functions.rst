@@ -33,3 +33,11 @@ The :code:`return` statement is used to pass an value out from a function and te
 Note that a :code:`return` statement must be inside a function.
 
 If a function has no :code:`return` statement and reaches to the end of its code, it will return :code:`null`.
+
+For example, the following code will print out :code:`3`::
+
+    my_func(x)
+        return x + 2
+    end my_func
+
+    output my_func(1) // "3"
