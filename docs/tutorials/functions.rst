@@ -15,6 +15,10 @@ Each function can take in any number of parameters. Note that there is no requir
 
 The order of function definition also doesn't matter; a function can be called in the global scope before it is defined.
 
+.. note::
+
+    In the original IB specification, functions are defined without the initial :code:`func` keyword; however, this leads to an ambiguous grammar (due to the grammar also being whitespace agnostic). As a workaround, the :code:`func` keyword was added.
+
 Invoking a Function
 -------------------
 
