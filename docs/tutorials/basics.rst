@@ -19,7 +19,7 @@ Programming is centered around values. In pseudocode, there are 5 basic types of
 
 - Integer: A value that represents a whole number, e.g. :code:`2`, :code:`69`, :code:`114514`.
 - Real: A value that represents a floating point number, e.g. :code:`69.6969`, :code:`3.14159`.
-- String: A text sequence, e.g. :code:`"donkey"`, :code:`'YAY'`. Both single and double quotes works.
+- String: A text sequence, e.g. :code:`"donkey"`, :code:`'YAY'`. Both single and double quotes work.
 - Boolean: A value of either :code:`true` or :code:`false`.
 - Null: A single value :code:`null` that denotes the absence of a valid value.
 
@@ -83,7 +83,7 @@ The output statement prints a line to the program output. It has a similar synta
 The output statement also accepts multiple parameters at once; the resulting output will simply be their concatenation::
 
     NAME = "Amy"
-    AGE = 19
-    output NAME, " is ", AGE, " years old"  // outputs "Amy is 19 years old"
+    AGE = 20
+    output NAME, " is ", AGE, " years old"  // outputs "Amy is 20 years old"
 
-:code:`output` automatically connverts its parameters into strings. This behavior is identical to wrapping each parameter in the :code:`str` conversion function.
+:code:`output` automatically converts its parameters into strings. This behavior is identical to wrapping each parameter in the :code:`str` conversion function.
