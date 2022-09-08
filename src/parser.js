@@ -509,13 +509,12 @@ export class FuncDecl extends Node {
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
 
-        context.code.push(new Code.CodeLoadLit(this.line, Runtime.NULL()));
-        context.code.push(new Code.CodeRet(this.line));
-        
-        /* if (!(context.code[context.code.length - 1] instanceof Code.CodeRet)) {
+        // Manually adds return statement if there isn't one at the end.
+        const len = this.stmts.length;
+        if (len === 0 || !(this.stmts[len - 1] instanceof Code.CodeRet)) {
             context.code.push(new Code.CodeLoadLit(this.line, Runtime.NULL()));
             context.code.push(new Code.CodeRet(this.line));
-        } */
+        }
 
         context.pop(this);
     }
