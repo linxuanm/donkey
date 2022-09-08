@@ -5,7 +5,7 @@ Functions
 
 The syntax of defining a function is as follows::
 
-    <func_name>(<param_1>, <param_2>, ..., <param_n>)
+    func <func_name>(<param_1>, <param_2>, ..., <param_n>)
         <code>
     end <func_name>
 
@@ -36,7 +36,7 @@ If a function has no :code:`return` statement and reaches to the end of its code
 
 For example, the following code will print out :code:`3`::
 
-    my_func(x)
+    func my_func(x)
         return x + 2
     end my_func
 

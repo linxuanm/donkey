@@ -11,7 +11,7 @@ Recursive Sort
 
 The following function :code:`sort` sorts a given list with a recursive algorithm::
 
-    sort(A)
+    func sort(A)
         if A.length() <= 1 then
             return A
         else
@@ -36,7 +36,7 @@ N-Queen Problem
 
 The following code solves the `N-Queen <https://en.wikipedia.org/wiki/Eight_queens_puzzle>`_ problem with brute force::
 
-    nQueen(BOARD, N, DEPTH)
+    func nQueen(BOARD, N, DEPTH)
         if DEPTH == N then
             logBoard(BOARD)
             return
@@ -59,14 +59,14 @@ The following code solves the `N-Queen <https://en.wikipedia.org/wiki/Eight_quee
         end loop
     end nQueen
 
-    abs(X)
+    func abs(X)
         if X < 0 then
             return -X
         end if
         return X
     end abs
 
-    logBoard(BOARD)
+    func logBoard(BOARD)
         N = BOARD.length()
         loop I from 0 to N - 1
             LINE = ''
