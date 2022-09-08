@@ -271,29 +271,30 @@ BIN_OP['div'] = BIN_OP['/'];
 BIN_OP['mod'] = BIN_OP['%'];
 
 export function repr(exp, depth = 0) {
-    if (exp.type === 'string') return `"${exp.value}"`;
+    if (exp.type === 'string') return `"${toString(exp, depth)}"`;
     return toString(exp, depth)
 }
 
 function toString(exp, depth = 0) {
     if (depth >= 6) return '...';
 
+    const iterRepr = x => repr(x, depth + 1);
     switch (exp.type) {
         case 'integer':
         case 'real':
         case 'boolean':
             return exp.value.toString();
         case 'string':
-            return exp.value;
+            return exp.value.replaceAll(' ', '\u00A0');
         case 'List':
-            return `[${exp.value.map(x => repr(x, depth + 1)).join(', ')}]`;
+            return `[${exp.value.map(iterRepr).join(', ')}]`;
         case 'null':
             return 'null';
         case 'Stack':
         case 'Queue':
-            return `${exp.type}[${exp.value.map(x => repr(x, depth + 1)).join(', ')}]`;
+            return `${exp.type}[${exp.value.map(iterRepr).join(', ')}]`;
         case 'Collection':
-            const suf = `[${exp.value.data.map(x => repr(x, depth + 1)).join(', ')}]`;
+            const suf = `[${exp.value.data.map(iterRepr).join(', ')}]`;
             return `Collection(ptr=${exp.value.iter})` + suf;
     }
 
