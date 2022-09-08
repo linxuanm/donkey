@@ -116,7 +116,7 @@ A collection can be created via the :code:`collection()` built-in method, which 
 
 The methods available for a collection (assuming that it is named :code:`COL`) are:
 
-    - :code:`COL.add(VALUE)`: Appends :code:`VALUE` to the end of the collection, and returns :code:`null`.
+    - :code:`COL.addItem(VALUE)`: Appends :code:`VALUE` to the end of the collection, and returns :code:`null`.
     - :code:`COL.addAll(ELEMENTS)`: Appends all elements in :code:`ELEMENTS` (a list) into the collection in the order given by :code:`ELEMENTS`.
     - :code:`COL.isEmpty()`: Returns a boolean value indicating whether the collection is empty.
     - :code:`COL.resetNext()`: Resets the pointer of the collection to the beginning, and returns :code:`null`.
