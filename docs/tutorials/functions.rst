@@ -17,7 +17,15 @@ The order of function definition also doesn't matter; a function can be called i
 
 .. note::
 
-    In the original IB specification, functions are defined without the initial :code:`func` keyword; however, this leads to an ambiguous grammar (due to the grammar also being whitespace agnostic). As a workaround, the :code:`func` keyword was added.
+    In the original IB specification, functions are defined without the initial :code:`func` keyword; however, this leads to an ambiguous grammar (due to the grammar also being whitespace agnostic). This is demonstrated with the code below code::
+
+        my_func(x)
+        
+        my_func(y)
+            output y
+        end my_fuc
+    
+    As a workaround, the :code:`func` keyword was added.
 
 Invoking a Function
 -------------------
