@@ -270,12 +270,14 @@ export const BIN_OP = {
 BIN_OP['div'] = BIN_OP['/'];
 BIN_OP['mod'] = BIN_OP['%'];
 
-export function repr(exp) {
+export function repr(exp, depth = 0) {
     if (exp.type === 'string') return `"${exp.value}"`;
-    return toString(exp)
+    return toString(exp, depth)
 }
 
-function toString(exp) {
+function toString(exp, depth = 0) {
+    if (depth >= 6) return '...';
+
     switch (exp.type) {
         case 'integer':
         case 'real':
@@ -284,14 +286,14 @@ function toString(exp) {
         case 'string':
             return exp.value;
         case 'List':
-            return `[${exp.value.map(repr).join(', ')}]`;
+            return `[${exp.value.map(x => repr(x, depth + 1)).join(', ')}]`;
         case 'null':
             return 'null';
         case 'Stack':
         case 'Queue':
-            return `${exp.type}[${exp.value.map(repr).join(', ')}]`;
+            return `${exp.type}[${exp.value.map(x => repr(x, depth + 1)).join(', ')}]`;
         case 'Collection':
-            const suf = `[${exp.value.data.map(repr).join(', ')}]`;
+            const suf = `[${exp.value.data.map(x => repr(x, depth + 1)).join(', ')}]`;
             return `Collection(ptr=${exp.value.iter})` + suf;
     }
 
