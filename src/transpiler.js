@@ -1,4 +1,4 @@
-import { Stmt, FuncDecl, dummyLine } from './parser';
+import { Stmt, FuncDecl, dummyLine, RetStmt, getNull } from './parser';
 import * as Prelude from './prelude';
 
 class CodeGenContext {
@@ -53,7 +53,6 @@ export function transpile(code, debugMode) {
     );
     funcs.push(mainFunc);
 
-    // console.log(funcs);
     const packaged = funcs.map(e => {
         const context = new CodeGenContext(debugMode);
         e.codeGen(context);

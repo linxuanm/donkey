@@ -75,7 +75,7 @@ const langTokens = {
 const keywordSets = {
     controlKeyword: new Set([
         'if', 'else', 'then', 'for', 'while', 'until',
-        'loop', 'end', 'from', 'to'
+        'loop', 'end', 'from', 'to', 'func'
     ]),
     operatorKeyword: new Set([
         'and', 'or', 'not', 'mod', 'div'

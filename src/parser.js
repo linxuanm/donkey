@@ -424,10 +424,10 @@ export class RetStmt extends Stmt {
 
     codeGen(context) {
         const func = context.stack[0];
-        if (func.name === '$main') throw new Runtime.VMError(
+        if (func.name === '$main') throw [
             `Line ${this.line.line}: Code Structure Error`, 
             'Return statement outside of function'
-        );
+        ];
 
         this.exp.codeGen(context);
         context.code.push(new Code.CodeRet(this.line));
@@ -508,16 +508,20 @@ export class FuncDecl extends Node {
     codeGen(context) {
         context.push(this);
         this.stmts.forEach(e => e.codeGen(context));
-        if (!(context.code[context.code.length - 1] instanceof Code.CodeRet)) {
+
+        context.code.push(new Code.CodeLoadLit(this.line, Runtime.NULL()));
+        context.code.push(new Code.CodeRet(this.line));
+        
+        /* if (!(context.code[context.code.length - 1] instanceof Code.CodeRet)) {
             context.code.push(new Code.CodeLoadLit(this.line, Runtime.NULL()));
             context.code.push(new Code.CodeRet(this.line));
-        }
+        } */
 
         context.pop(this);
     }
 }
 
-function getNull(start) {
+export function getNull(start) {
     return new LitExp(start, 'null', null);
 }
 
@@ -664,6 +668,7 @@ export const lang = P.createLanguage({
     },
     Func: r => {
         const parser = P.seqObj(
+            P.string('func').skip(__),
             ['name', iden.mark()],
             _,
             ['params', parens(
@@ -847,7 +852,7 @@ export const lang = P.createLanguage({
     },
     Global: r => {
         return optWhite.then(
-            P.alt(r.Func, r.Stmt).sepBy(r.LineDiv).skip(optWhite)
+            P.alt(r.Stmt, r.Func).sepBy(r.LineDiv).skip(optWhite)
         );
     },
     LineDiv: r => {
