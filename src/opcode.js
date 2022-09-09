@@ -50,14 +50,15 @@ export class CodeJump extends OpCode {
 
 export class CodeJumpIf extends OpCode {
 
-    constructor(line, target) {
+    constructor(line, target, invert = false) {
         super(line);
         this.target = target;
+        this.invert = invert;
     }
 
     execute(vm, frame) {
         const top = vm.pop();
-        if (top.bool(this.line)) frame.pc = this.target;
+        if (top.bool(this.line) ^ this.invert) frame.pc = this.target;
     }
 }
 
