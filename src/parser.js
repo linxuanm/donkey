@@ -740,6 +740,7 @@ export const lang = P.createLanguage({
             _,
             ['params', r.ListExpCont]
         ).map(e => {
+            console.log(e);
             let joined;
             if (e.params.length !== 0) {
                 const ref = e.params[0];
@@ -754,7 +755,7 @@ export const lang = P.createLanguage({
                     return new BinExp(e.line.start, '+', a, b);
                 });
             } else {
-                joined = new LitExp(this.line, 'string', '');
+                joined = new LitExp(e.line.start, 'string', '');
             }
             const funcExp = new CallExp(e.line.start, '$output', [joined], false);
             return new FuncCallStmt(funcExp);
