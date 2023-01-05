@@ -15,15 +15,15 @@ Mathematical operations in pseudocode are similar to that in any other languages
     B = 45
     output A + B  // outputs "69"
 
-There are 5 math related binary operations: :code:`+`, :code:`-`, :code:`*`, :code:`/` and :code:`%`, which correspondes to addition, subtraction, multiplication, division and modulus respectively. Operators have precedence, i.e. :code:`A + B * C` is interpreted as :code:`A + (B * C)`.
+There are 6 math related binary operations: :code:`+`, :code:`-`, :code:`*`, :code:`/`, :code:`%` and :code:`div`, which correspondes to addition, subtraction, multiplication, division, modulus and integer division respectively. Operators have precedence, i.e. :code:`A + B * C` is interpreted as :code:`A + (B * C)`.
 
 .. note::
 
-    According to the IB Pseudocode Guide, the division and modulus operators are commonly written in word form: :code:`div` and :code:`mod`. Donkey IDE also supports this. :code:`div` is functionally identical to :code:`/` and the same applies to :code:`mod` and :code:`%`. For example, :code:`32 mod 3` is the same as :code:`32 % 3`.
+    According to the IB Pseudocode Guide, the modulus operators are commonly written in word form: :code:`mod`. Donkey IDE also supports this. :code:`mod` is functionally identical to :code:`%`. For example, :code:`32 mod 3` is the same as :code:`32 % 3`.
 
-Note that the quotient of integers is a real number (contains decimal points). To perform integer division, simply wrap the expression in :code:`int()` to round it down::
+Note that the quotient of integers is a real number (contains decimal points). To perform integer division, use :code:`div` instead of :code:`/`::
 
-    output int(20 / 3)  // outputs "6"
+    output 20 div 3  // outputs "6"
 
 The integer conversion function is crucial, as certain operations require an integer type instead of a real number (even if the real is a whole number), such as indexing an array.
 
