@@ -265,9 +265,17 @@ export const BIN_OP = {
             }
             return a.value[b.value];
         }
-    }
+    },
+    'div': {
+        verify: isNum,
+        calc: (a, b) => {
+            if (b.value == 0) throw new Runtime.VMError(
+                'Value Error', 'Division by 0'
+            );
+            return new Runtime.DonkeyObject('real', Math.floor(a.value / b.value));
+        }
+    },
 };
-BIN_OP['div'] = BIN_OP['/'];
 BIN_OP['mod'] = BIN_OP['%'];
 
 export function repr(exp, depth = 0) {
