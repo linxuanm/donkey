@@ -139,6 +139,7 @@ textarea {
     transition: 0.2s;
     height: 30px;
     cursor: pointer;
+    margin: 0 10px;
 }
 
 .icon-menu:hover {

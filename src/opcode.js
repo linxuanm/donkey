@@ -76,8 +76,7 @@ export class CodeLoadVar extends OpCode {
 
 /*
     Pops and stores the stack top; prioritizing the global '$main'
-    scope if the name is already defined there. If var is not declared
-    in the global scope then just shove it in local.
+    scope if the name is not defined in the local scope.
 
     Yea ik weird design but IB also didn't specify the scoping/referencing
     rules for global variables so imma improvise.
@@ -90,7 +89,7 @@ export class CodeStoreVar extends OpCode {
     }
 
     execute(vm, frame) {
-        if (this.name in vm.mainEnv) {
+        if (this.name in vm.mainEnv && !(this.name in frame.locals)) {
             vm.mainEnv[this.name] = vm.pop();
         } else {
             frame.locals[this.name] = vm.pop();
