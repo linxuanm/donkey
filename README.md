@@ -20,6 +20,16 @@ Quick links:
 - [Debugger](https://donkey.readthedocs.io/en/latest/tutorials/debugging.html)
 - [Sample Code](https://donkey.readthedocs.io/en/latest/tutorials/examples.html)
 
+## Build Instructions
+
+```sh
+git clone https://github.com/davidmaamoaix/donkey.git
+cd donkey
+browserify src/index.js -p esmify | uglifyjs > bundle.js
+```
+
+Then simply open `index.html` in a browser.
+
 ## but david the gui looks familiar
 
 yea it uses the color scheme of vs code cuz i can't design lol
