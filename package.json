@@ -4,7 +4,7 @@
   "description": "Donkey is an online IDE and debugger for IB Pseudocode.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify src/index.js -p esmify | uglifyjs > bundle.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "parsimmon": "^1.18.1"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
     "esmify": "^2.1.1"
   }
 }

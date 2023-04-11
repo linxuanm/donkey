@@ -51,7 +51,7 @@ const strLit = P.alt(
 const bool = P.regexp(/true|false/).map(e => e === 'true');
 
 /*
-    Normally I don't think its good js pattern to enforce abstract
+    Normally I don't think its good JS pattern to enforce abstract
     methods and stuff but the IB project requirement kinda stupidly
     enforces a UML and 'oH eVeRyThInG iS aBsTrAcT' so here goes.
 */

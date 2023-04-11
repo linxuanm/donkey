@@ -63,6 +63,7 @@ export function transpile(code, debugMode) {
             code: context.code
         };
     });
+    
     console.log(packaged)
 
     return packaged;
