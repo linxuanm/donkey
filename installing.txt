@@ -1,0 +1,10 @@
+This file contains instructions for the IB examiner to setup and test the "Donkey IDE" project.
+
+The submitted project files include the "bundle.js" file, which is the built code for the project. You should be able to use the project by simply opening "index.html" in a browser. However, if you would like to build the project from its source code, follow the following instructions.
+
+Build instructions:
+1. Install the Node.js runtime: https://nodejs.org. This should also install the "npm" package manager.
+2. Move into the project directory with the `cd` command.
+3. Run `npm install` to install the dependencies for the project.
+4. Run `npm run build` to build the source code. This results in a new "bundle.js" file in the project directory.
+5. Open "index.html" in a browser to access the project.
